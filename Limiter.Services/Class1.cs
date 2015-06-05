@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Limiter
+namespace SzLimiter.Services
 {
     public class Class1
     {

@@ -39,8 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="ILimitStore.cs" />
+    <Compile Include="Limiter.cs" />
+    <Compile Include="LocalLimitStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Limiter.Services\Limiter.Services.csproj">
+      <Project>{9608aa6a-6f92-4e95-b09c-52ceb0f002aa}</Project>
+      <Name>Limiter.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
