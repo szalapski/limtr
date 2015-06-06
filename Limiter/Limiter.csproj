@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AzureLimitStore.cs" />
     <Compile Include="ILimitStore.cs" />
     <Compile Include="Limiter.cs" />
     <Compile Include="LocalLimitStore.cs" />
