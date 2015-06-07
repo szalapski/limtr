@@ -8,13 +8,13 @@ namespace Limiter.Tests.Unit {
 
         [TestMethod]
         public void Limit_DefaultBucketFor2PerMinuteCallOnce_DoesNotLimit() {
-            var store = new AzureLimitStore(2);
+            var store = new RedisLimitStore(2);
             bool result = store.Limit(appKey, "1.2.3.1");
             Assert.IsFalse(result);
         }
         [TestMethod]
         public void Limit_DefaultBucketFor2PerMinuteCallThrice_Limits() {
-            var limiter = new AzureLimitStore(2);
+            var limiter = new RedisLimitStore(2);
             string testLimitKey = "1.2.3.2";
             limiter.Limit(appKey, testLimitKey);
             limiter.Limit(appKey, testLimitKey);
@@ -26,7 +26,7 @@ namespace Limiter.Tests.Unit {
 
         [TestMethod]
         public void Limit_DefaultBucketFor2PerHalfMinuteCallOnce_DoesNotLimit() {
-            var store = new AzureLimitStore(2, TimeSpan.FromSeconds(30));
+            var store = new RedisLimitStore(2, TimeSpan.FromSeconds(30));
 
             bool result = store.Limit(appKey, "1.2.3.3");
 
@@ -34,7 +34,7 @@ namespace Limiter.Tests.Unit {
         }
         [TestMethod]
         public void Limit_DefaultBucketFor2PerHalfMinuteCallThrice_Limits() {
-            var limiter = new AzureLimitStore(2, TimeSpan.FromSeconds(30));
+            var limiter = new RedisLimitStore(2, TimeSpan.FromSeconds(30));
             string testLimitKey = "1.2.3.4";
             limiter.Limit(appKey, testLimitKey);
             limiter.Limit(appKey, testLimitKey);
