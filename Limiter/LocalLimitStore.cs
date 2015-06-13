@@ -17,12 +17,6 @@ namespace Limiter {
         }
         private int _hitLimit;
         private TimeSpan _limitInterval = TimeSpan.FromMinutes(1);
-
-<<<<<<< HEAD
-=======
-
-        // naive way
->>>>>>> 9e74e6d461be1778fb0bf1cf2c8702b07dd7a51f
         private static Dictionary<string, Queue<DateTime>> _storage = new Dictionary<string, Queue<DateTime>>();
 
         public bool Limit(string dummyAppKey, string limitKey) {
