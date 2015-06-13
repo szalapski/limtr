@@ -35,8 +35,5 @@ namespace Limiter {
             return result;
         }
 
-        public void SetLimit(int hitsPerMinute) {
-            _hitLimit = hitsPerMinute;
-        }
     }
 }

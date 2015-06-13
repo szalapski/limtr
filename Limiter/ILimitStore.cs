@@ -6,6 +6,5 @@ using System.Text;
 namespace Limiter {
     public interface ILimitStore {
         bool Limit(string _appKey, string limitKey);
-        void SetLimit(int hitsPerMinute);
     }
 }

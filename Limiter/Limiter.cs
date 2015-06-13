@@ -29,9 +29,5 @@ namespace SzLimiter
             return _store.Limit(_appKey, limitKey);
         }
 
-        public void SetLimit(int hitsPerMinute){
-            _store.SetLimit(hitsPerMinute);
-        }
-
     }
 }
