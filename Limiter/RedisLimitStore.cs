@@ -17,14 +17,17 @@ namespace Limiter {
         private IDatabase _database;
 
         public bool Limit(string appKey, string limitKey) {
+            _database.Ping();
             string key = string.Format("{0}:{1}", appKey, limitKey);
-            RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit);
+            key = limitKey.Substring(0, 4);
+            RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit-1);
             if (itemInQuestion.HasValue && DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion) < _limitInterval)
             {
-                _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
-                return false;
+                // A disallowed call does not count against the limit
+                return true;
             }
-            else return true;
+            _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
+            return false;
 
         }
 

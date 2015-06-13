@@ -6,12 +6,16 @@ namespace Limiter.Tests.Integration
     [TestClass]
     public class RedisLimitStoreITests
     {
-        private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(new ConfigurationOptions() {
-            EndPoints = { { "limtr.redis.cache.windows.net", 6379 } },
-            Password = "sAR88chKOP4xtk9dVI6uCbZTqsg5pyq/jc7eKg3pHqI=",
-        });
+        private readonly ConnectionMultiplexer redis;
+
+        public RedisLimitStoreITests()
+        {
+            var azureRedisOptions = new ConfigurationOptions() { EndPoints = { { "limtr.redis.cache.windows.net", 6379 } }, Password = "sAR88chKOP4xtk9dVI6uCbZTqsg5pyq/jc7eKg3pHqI=" };
+            var localRedisOptions = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false };
+            redis = ConnectionMultiplexer.Connect(localRedisOptions);
+        }
+
         private const string appKey = "AzureLimitStoreTests_AppKey";
-       
 
         [TestMethod]
         public void TestRedisConnection()
