@@ -10,8 +10,12 @@ namespace Limiter {
             _limitInterval = TimeSpan.FromMinutes(1);
         }
 
+<<<<<<< HEAD
         public RedisLimitStore(IDatabase redisDatabase, int hitLimit, TimeSpan interval)
         {
+=======
+        public RedisLimitStore(int hitLimit, TimeSpan interval) {
+>>>>>>> 9e74e6d461be1778fb0bf1cf2c8702b07dd7a51f
             _hitLimit = hitLimit;
             _limitInterval = interval;
 
@@ -20,7 +24,14 @@ namespace Limiter {
         private TimeSpan _limitInterval = TimeSpan.FromMinutes(1);
 
         public bool Limit(string _appKey, string limitKey) {
+<<<<<<< HEAD
             
+=======
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("foo");
+
+
+            throw new NotImplementedException();
+>>>>>>> 9e74e6d461be1778fb0bf1cf2c8702b07dd7a51f
         }
 
         public void SetLimit(int hitsPerMinute) {
