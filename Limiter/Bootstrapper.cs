@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StackExchange.Redis;
+﻿using StackExchange.Redis;
 
-namespace SzLimiter {
+namespace Limtr.Lib {
     public static class Bootstrapper { 
         private static ConnectionMultiplexer muxer;
 
@@ -14,9 +9,9 @@ namespace SzLimiter {
             muxer = ConnectionMultiplexer.Connect(redisOptions);
         }
 
-        public static Limiter AzureLimiter {
+        public static FatClient AzureFatClient {
             get{
-                return new Limiter("test", new RedisLimitStore(muxer.GetDatabase(), 2));
+                return new FatClient("test", new RedisLimitStore(muxer.GetDatabase(), 2));
             }
         }   
     }

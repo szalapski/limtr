@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http.Headers;
 using System.Web.Http.Description;
-using SzLimiter.WebService.Areas.HelpPage.ModelDescriptions;
+using Limtr.WebService.Areas.HelpPage.ModelDescriptions;
 
-namespace SzLimiter.WebService.Areas.HelpPage.Models
+namespace Limtr.WebService.Areas.HelpPage.Models
 {
     /// <summary>
     /// The model that represents an API displayed on the help page.

@@ -1,4 +1,4 @@
-namespace SzLimiter.WebService.Areas.HelpPage
+namespace Limtr.WebService.Areas.HelpPage
 {
     /// <summary>
     /// Indicates whether the sample is used for request or response

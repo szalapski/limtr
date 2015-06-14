@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace SzLimiter.WebService.Areas.HelpPage.ModelDescriptions
+namespace Limtr.WebService.Areas.HelpPage.ModelDescriptions
 {
     public class ParameterDescription
     {

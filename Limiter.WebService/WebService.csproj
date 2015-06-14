@@ -11,8 +11,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Limiter.WebService</RootNamespace>
-    <AssemblyName>Limiter.WebService</AssemblyName>
+    <RootNamespace>Limtr.WebService</RootNamespace>
+    <AssemblyName>Limtr.WebService</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -241,9 +241,9 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Limiter\Limiter.csproj">
+    <ProjectReference Include="..\Limiter\Lib.csproj">
       <Project>{ed790e4d-23cd-49d3-8852-1d29a9202399}</Project>
-      <Name>Limiter</Name>
+      <Name>Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

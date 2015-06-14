@@ -2,7 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StackExchange.Redis;
 using System.Diagnostics;
-namespace SzLimiter.Tests.Integration {
+using Limtr.Lib;
+
+namespace Limtr.Lib.Tests.Integration {
     [TestClass]
     public class RedisLimitStoreITests_Local {
         private readonly ConnectionMultiplexer redis;

@@ -1,6 +1,6 @@
 using System;
 
-namespace SzLimiter.WebService.Areas.HelpPage.ModelDescriptions
+namespace Limtr.WebService.Areas.HelpPage.ModelDescriptions
 {
     /// <summary>
     /// Describes a type model.

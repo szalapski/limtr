@@ -1,15 +1,16 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Limtr.Lib;
 
-namespace SzLimiter.Tests.Unit {
+namespace Limtr.Lib.Tests.Unit {
     [TestClass]
-    public class LimiterTests {
+    public class FatClientTests {
 
         [TestMethod]
         void Limit1() {
             var mockStore = new Mock<ILimitStore>();
-            var limiter = new Limiter("LimiterTests", mockStore.Object);
+            var limiter = new Limtr.Lib.FatClient("LimiterTests", mockStore.Object);
             if (limiter.Allows("foo")) {
 
             }

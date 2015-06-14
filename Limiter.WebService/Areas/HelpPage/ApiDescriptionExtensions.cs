@@ -3,7 +3,7 @@ using System.Text;
 using System.Web;
 using System.Web.Http.Description;
 
-namespace SzLimiter.WebService.Areas.HelpPage
+namespace Limtr.WebService.Areas.HelpPage
 {
     public static class ApiDescriptionExtensions
     {

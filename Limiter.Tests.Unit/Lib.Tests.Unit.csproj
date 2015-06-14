@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EAEC79BD-81CC-4053-83A7-10FA2126A874}</ProjectGuid>
+    <ProjectGuid>{80197599-54FE-4951-8972-88B62F6E45F6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SzLimiter.Tests.Integration</RootNamespace>
-    <AssemblyName>Limiter.Tests.Integration</AssemblyName>
+    <RootNamespace>Limtr.FatClient.Tests.Unit</RootNamespace>
+    <AssemblyName>Limtr.FatClient.Tests.Unit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1502.0911\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="StackExchange.Redis">
       <HintPath>..\packages\StackExchange.Redis.1.0.450\lib\net45\StackExchange.Redis.dll</HintPath>
     </Reference>
@@ -53,17 +56,18 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="RedisLimitStoreITests.cs" />
+    <Compile Include="FatClientTests.cs" />
+    <Compile Include="AzureLimitStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Limiter\Lib.csproj">
+      <Project>{ed790e4d-23cd-49d3-8852-1d29a9202399}</Project>
+      <Name>Lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Limiter\Limiter.csproj">
-      <Project>{ed790e4d-23cd-49d3-8852-1d29a9202399}</Project>
-      <Name>Limiter</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

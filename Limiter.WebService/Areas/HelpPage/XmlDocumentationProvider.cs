@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
-using SzLimiter.WebService.Areas.HelpPage.ModelDescriptions;
+using Limtr.WebService.Areas.HelpPage.ModelDescriptions;
 
-namespace SzLimiter.WebService.Areas.HelpPage
+namespace Limtr.WebService.Areas.HelpPage
 {
     /// <summary>
     /// A custom <see cref="IDocumentationProvider"/> that reads the API documentation from an XML documentation file.

@@ -1,7 +1,7 @@
 using System.Web.Http;
 using System.Web.Mvc;
 
-namespace SzLimiter.WebService.Areas.HelpPage
+namespace Limtr.WebService.Areas.HelpPage
 {
     public class HelpPageAreaRegistration : AreaRegistration
     {

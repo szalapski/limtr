@@ -7,8 +7,8 @@
     <ProjectGuid>{ED790E4D-23CD-49D3-8852-1D29A9202399}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SzLimiter</RootNamespace>
-    <AssemblyName>Limiter</AssemblyName>
+    <RootNamespace>Limtr.Lib</RootNamespace>
+    <AssemblyName>Limtr.Lib</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -46,7 +46,7 @@
     <Compile Include="LimitReachedException.cs" />
     <Compile Include="RedisLimitStore.cs" />
     <Compile Include="ILimitStore.cs" />
-    <Compile Include="Limiter.cs" />
+    <Compile Include="FatClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

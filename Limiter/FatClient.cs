@@ -1,8 +1,6 @@
-﻿using SzLimiter;
-
-namespace SzLimiter {
-    public class Limiter {
-        public Limiter(string appKey, ILimitStore store) {
+﻿namespace Limtr.Lib {
+    public class FatClient {
+        public FatClient(string appKey, ILimitStore store) {
             _appKey = appKey;
             _store = store;
         }

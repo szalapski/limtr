@@ -4,15 +4,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using SzLimiter;
+using Limtr.Lib;
 
-namespace SzLimiter.WebService.Controllers {
+namespace Limtr.WebService.Controllers {
     public class ValuesController : ApiController {
         public ValuesController() {
-            _limiter = Bootstrapper.AzureLimiter;   // todo: what about app key?
+            _limiter = Bootstrapper.AzureFatClient;   // todo: what about app key?
         }
 
-        private Limiter _limiter;
+        private FatClient _limiter;
 
         // GET api/values
         public IEnumerable<string> Get() {

@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace SzLimiter.WebService.Areas.HelpPage.ModelDescriptions
+namespace Limtr.WebService.Areas.HelpPage.ModelDescriptions
 {
     public interface IModelDocumentationProvider
     {

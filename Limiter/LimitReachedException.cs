@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SzLimiter {
+namespace Limtr.Lib {
     public class LimitReachedException : ApplicationException {
     }
 }

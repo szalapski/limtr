@@ -1,4 +1,4 @@
-namespace SzLimiter.WebService.Areas.HelpPage.ModelDescriptions
+namespace Limtr.WebService.Areas.HelpPage.ModelDescriptions
 {
     public class KeyValuePairModelDescription : ModelDescription
     {

@@ -1,10 +1,10 @@
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
-using SzLimiter.WebService.Areas.HelpPage.ModelDescriptions;
-using SzLimiter.WebService.Areas.HelpPage.Models;
+using Limtr.WebService.Areas.HelpPage.ModelDescriptions;
+using Limtr.WebService.Areas.HelpPage.Models;
 
-namespace SzLimiter.WebService.Areas.HelpPage.Controllers
+namespace Limtr.WebService.Areas.HelpPage.Controllers
 {
     /// <summary>
     /// The controller that will handle requests for the help page.

@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace SzLimiter { 
+namespace Limtr.Lib { 
     public class RedisLimitStore : ILimitStore {
         public RedisLimitStore(IDatabase redisDatabase, int hitLimitPerMinute) : this(redisDatabase, hitLimitPerMinute, TimeSpan.FromMinutes(1)) {
         }
