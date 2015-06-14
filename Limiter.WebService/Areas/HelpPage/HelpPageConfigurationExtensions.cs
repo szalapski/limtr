@@ -11,10 +11,10 @@ using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using Limiter.WebService.Areas.HelpPage.ModelDescriptions;
-using Limiter.WebService.Areas.HelpPage.Models;
+using SzLimiter.WebService.Areas.HelpPage.ModelDescriptions;
+using SzLimiter.WebService.Areas.HelpPage.Models;
 
-namespace Limiter.WebService.Areas.HelpPage
+namespace SzLimiter.WebService.Areas.HelpPage
 {
     public static class HelpPageConfigurationExtensions
     {

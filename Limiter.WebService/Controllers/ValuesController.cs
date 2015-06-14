@@ -4,17 +4,24 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using SzLimiter;
 
-namespace Limiter.WebService.Controllers {
+namespace SzLimiter.WebService.Controllers {
     public class ValuesController : ApiController {
+        public ValuesController() {
+            _limiter = Bootstrapper.AzureLimiter;   // todo: what about app key?
+        }
+
+        private Limiter _limiter;
+
         // GET api/values
         public IEnumerable<string> Get() {
             return new string[] { "value1", "value2" };
         }
 
         // POST api/values
-        public void Post([FromBody]string appKey, [FromBody]string limitKey) {
-
+        public bool Post([FromBody]string appKey, [FromBody]string limitKey) {
+            return _limiter.Allows(limitKey);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Limiter.WebService.Areas.HelpPage.ModelDescriptions
+namespace SzLimiter.WebService.Areas.HelpPage.ModelDescriptions
 {
     public class ParameterAnnotation
     {

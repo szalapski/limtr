@@ -1,6 +1,6 @@
 using System;
 
-namespace Limiter.WebService.Areas.HelpPage
+namespace SzLimiter.WebService.Areas.HelpPage
 {
     /// <summary>
     /// This represents an invalid sample on the help page. There's a display template named InvalidSample associated with this class.
