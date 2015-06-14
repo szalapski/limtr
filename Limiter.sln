@@ -9,6 +9,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limiter.Tests.Unit", "Limit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limiter.Tests.Integration", "Limiter.Tests.Integration\Limiter.Tests.Integration.csproj", "{EAEC79BD-81CC-4053-83A7-10FA2126A874}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limiter.WebService", "Limiter.WebService\Limiter.WebService.csproj", "{C7EE6DAB-ED90-4FCE-A28B-E5E9C0F80DFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{EEF29052-3088-4C14-8DDE-E66F70E5D648}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\AzureWebsitePublishModule.psm1 = PublishScripts\AzureWebsitePublishModule.psm1
+		PublishScripts\Publish-WebApplicationWebsite.ps1 = PublishScripts\Publish-WebApplicationWebsite.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configurations", "Configurations", "{B2784E07-7A1B-4F90-A6AD-CD2AEE186B7B}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Configurations\LimiterWebService-WAWS-dev.json = PublishScripts\Configurations\LimiterWebService-WAWS-dev.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +40,15 @@ Global
 		{EAEC79BD-81CC-4053-83A7-10FA2126A874}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAEC79BD-81CC-4053-83A7-10FA2126A874}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAEC79BD-81CC-4053-83A7-10FA2126A874}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7EE6DAB-ED90-4FCE-A28B-E5E9C0F80DFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7EE6DAB-ED90-4FCE-A28B-E5E9C0F80DFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7EE6DAB-ED90-4FCE-A28B-E5E9C0F80DFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7EE6DAB-ED90-4FCE-A28B-E5E9C0F80DFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2784E07-7A1B-4F90-A6AD-CD2AEE186B7B} = {EEF29052-3088-4C14-8DDE-E66F70E5D648}
 	EndGlobalSection
 EndGlobal
