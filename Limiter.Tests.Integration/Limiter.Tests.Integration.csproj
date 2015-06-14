@@ -6,7 +6,7 @@
     <ProjectGuid>{EAEC79BD-81CC-4053-83A7-10FA2126A874}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Limiter.Tests.Integration</RootNamespace>
+    <RootNamespace>SzLimiter.Tests.Integration</RootNamespace>
     <AssemblyName>Limiter.Tests.Integration</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

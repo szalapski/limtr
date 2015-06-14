@@ -7,7 +7,7 @@
     <ProjectGuid>{ED790E4D-23CD-49D3-8852-1D29A9202399}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Limiter</RootNamespace>
+    <RootNamespace>SzLimiter</RootNamespace>
     <AssemblyName>Limiter</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

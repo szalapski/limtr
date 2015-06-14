@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StackExchange.Redis;
 using Moq;
 
-namespace Limiter.Tests.Unit {
+namespace SzLimiter.Tests.Unit {
     [TestClass]
     public class AzureLimitStoreTests {
        

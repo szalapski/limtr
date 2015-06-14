@@ -1,7 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 
-namespace Limiter { 
+namespace SzLimiter { 
     public class RedisLimitStore : ILimitStore {
         public RedisLimitStore(IDatabase redisDatabase, int hitLimitPerMinute) : this(redisDatabase, hitLimitPerMinute, TimeSpan.FromMinutes(1)) {
         }

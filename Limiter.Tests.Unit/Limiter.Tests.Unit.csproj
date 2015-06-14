@@ -6,7 +6,7 @@
     <ProjectGuid>{80197599-54FE-4951-8972-88B62F6E45F6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Limiter.Tests.Unit</RootNamespace>
+    <RootNamespace>SzLimiter.Tests.Unit</RootNamespace>
     <AssemblyName>Limiter.Tests.Unit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

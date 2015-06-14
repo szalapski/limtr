@@ -1,4 +1,4 @@
-﻿using Limiter;
+﻿using SzLimiter;
 
 namespace SzLimiter {
     public class Limiter {

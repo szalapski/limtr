@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StackExchange.Redis;
-namespace Limiter.Tests.Integration
+namespace SzLimiter.Tests.Integration
 {
     [TestClass]
     public class RedisLimitStoreITests

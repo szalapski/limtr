@@ -7,7 +7,7 @@
     <ProjectGuid>{199C279A-AA30-4CF8-B630-5E0BF57C7A85}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Limiter.Services.Tests.Unit</RootNamespace>
+    <RootNamespace>SzLimiter.Services.Tests.Unit</RootNamespace>
     <AssemblyName>Limiter.Services.Tests.Unit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
