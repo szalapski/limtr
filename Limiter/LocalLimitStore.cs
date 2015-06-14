@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SzLimiter {
+namespace Limiter {
     public class LocalLimitStore : ILimitStore {
 
         public LocalLimitStore(int hitLimitPerMinute) {
@@ -41,10 +41,5 @@ namespace SzLimiter {
         public void SetLimit(int hitsPerMinute) {
             _hitLimit = hitsPerMinute;
         }
-
-        public int GetLimit() {
-            throw new NotImplementedException();
-        }
-
     }
 }

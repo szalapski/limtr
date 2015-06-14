@@ -1,7 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 
-namespace SzLimiter { 
+namespace Limiter { 
     public class RedisLimitStore : ILimitStore {
         public RedisLimitStore(IDatabase redisDatabase, int hitLimitPerMinute) {
             // TODO: integrate with Azure?
@@ -28,10 +28,5 @@ namespace SzLimiter {
         public void SetLimit(int hitsPerMinute) {
             throw new NotImplementedException();
         }
-
-        public int GetLimit() {
-            throw new NotImplementedException();
-        }
-
     }
 }
