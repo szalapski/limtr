@@ -23,7 +23,6 @@ namespace SzLimiter {
         }
 
         private bool Allows(string key) {
-            RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit - 1);
             bool allowed = IsAllowed(key);
             if (allowed) AddHit(key);       // A disallowed call does not count against the limit
             return allowed;
