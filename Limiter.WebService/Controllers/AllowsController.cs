@@ -7,8 +7,8 @@ using System.Web.Http;
 using Limtr.Lib;
 
 namespace Limtr.WebService.Controllers {
-    public class ValuesController : ApiController {
-        public ValuesController() {
+    public class AllowsController : ApiController {
+        public AllowsController() {
             _limiter = Bootstrapper.AzureFatClient;   // todo: what about app key?
         }
 
