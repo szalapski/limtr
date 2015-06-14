@@ -1,4 +1,5 @@
 ﻿using StackExchange.Redis;
+using System;
 
 namespace Limtr.Lib {
     public static class Bootstrapper { 
@@ -11,7 +12,7 @@ namespace Limtr.Lib {
 
         public static FatClient AzureFatClient {
             get{
-                return new FatClient("test", new RedisLimitStore(muxer.GetDatabase(), 2));
+                return new FatClient("test", new RedisLimitStore(muxer.GetDatabase(), 2, TimeSpan.FromSeconds(10)));
             }
         }   
     }
