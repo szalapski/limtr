@@ -17,18 +17,36 @@ namespace SzLimiter {
         private IDatabase _database;
 
         public bool Allows(string appKey, string limitKey) {
-            _database.Ping();
-            string key = string.Format("{0}:{1}", appKey, limitKey);
-            key = limitKey.Substring(0, 4);
-            RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit-1);
-            
-            // A disallowed call does not count against the limit
-            if (itemInQuestion.HasValue && DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion) < _limitInterval) return false;
-            
-            _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
-            return true;
-
+            string key = MakeKey(appKey, limitKey);
+            return Allows(key);
         }
 
+        private bool Allows(string key) {
+            RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit - 1);
+            bool allowed = IsAllowed(key);
+            if (allowed) AddHit(key);       // A disallowed call does not count against the limit
+            return allowed;
+        }
+
+        public bool IsAllowed(string appKey, string limitKey) {
+            string key = MakeKey(appKey, limitKey);
+            return IsAllowed(key);
+        }
+
+        private bool IsAllowed(string key) {
+            RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit - 1);
+            return (!itemInQuestion.HasValue || DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion) > _limitInterval);
+        }
+
+        private static string MakeKey(string appKey, string limitKey) {
+            if (string.IsNullOrWhiteSpace(appKey)) appKey = "default";
+            if (string.IsNullOrWhiteSpace(limitKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
+            return string.Format("{0}:{1}", appKey, limitKey);
+        }
+
+
+        private void AddHit(string key) {
+            _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
+        }
     }
 }

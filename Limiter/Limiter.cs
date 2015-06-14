@@ -10,15 +10,23 @@ namespace SzLimiter {
         private string _appKey {get; set;}
 
         /// <summary>
-        /// Records a hit for the given limit key and returns a status.
+        /// If the operation represented by the limit key is allowed, records a hit.
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
         public bool Allows(string limitKey) {
-            return !_store.Allows(_appKey, limitKey);
+            return _store.Allows(_appKey, limitKey);
         }
 
         /// <summary>
-        /// Records a hit for the given limit key, and throws exception if the operation should be rejected or throttled.
+        /// Peeks at whether the operation represented by the limit key is allowed. Does not record a hit.
+        /// </summary>
+        /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
+        public bool IsAllowed(string limitKey) {
+            return _store.IsAllowed(_appKey, limitKey);
+        }
+
+        /// <summary>
+        /// If the operation represented by the limit key is allowed, records a hit; throws exception if the operation should be rejected or throttled.
         /// </summary>
         /// <exception cref="LimitReachedException">Thrown if the operation should be rejected or throttled</exception>
         public void Hit(string limitKey) {

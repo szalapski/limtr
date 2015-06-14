@@ -46,7 +46,6 @@
     <Compile Include="RedisLimitStore.cs" />
     <Compile Include="ILimitStore.cs" />
     <Compile Include="Limiter.cs" />
-    <Compile Include="LocalLimitStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
