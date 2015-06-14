@@ -8,7 +8,11 @@ namespace SzLimiter.Tests.Unit {
 
         [TestMethod]
         void Limit1() {
-           // var limiter = new Limiter("LimiterTests", )
+            var mockStore = new Mock<ILimitStore>();
+            var limiter = new Limiter("LimiterTests", mockStore.Object);
+            if (limiter.Allows("foo")) {
+
+            }
 
         }
      

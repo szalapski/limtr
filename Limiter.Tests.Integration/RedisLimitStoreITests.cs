@@ -26,46 +26,46 @@ namespace SzLimiter.Tests.Integration
         }
 
         [TestMethod]
-        public void Limit_DefaultBucketFor2PerMinuteCallOnce_DoesNotLimit()
+        public void Allows_DefaultBucketFor2PerMinuteCallOnce_DoesNotLimit()
         {
             var db = redis.GetDatabase();
 
             var store = new RedisLimitStore(db, 2);
-            bool result = store.Limit(appKey, Guid.NewGuid().ToString());
-            Assert.IsFalse(result);
+            bool result = store.Allows(appKey, Guid.NewGuid().ToString());
+            Assert.IsTrue(result);
         }
         [TestMethod]
-        public void Limit_DefaultBucketFor2PerMinuteCallThrice_Limits()
+        public void Allows_DefaultBucketFor2PerMinuteCallThrice_Limits()
         {
             var store = new RedisLimitStore(redis.GetDatabase(), 2);
             string testLimitKey = Guid.NewGuid().ToString();
-            store.Limit(appKey, testLimitKey);
-            store.Limit(appKey, testLimitKey);
+            store.Allows(appKey, testLimitKey);
+            store.Allows(appKey, testLimitKey);
 
-            bool result = store.Limit(appKey, testLimitKey);
-
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
-        public void Limit_DefaultBucketFor2PerHalfMinuteCallOnce_DoesNotLimit()
-        {
-            var store = new RedisLimitStore(redis.GetDatabase(), 2);
-
-            bool result = store.Limit(appKey, Guid.NewGuid().ToString());
+            bool result = store.Allows(appKey, testLimitKey);
 
             Assert.IsFalse(result);
         }
+
         [TestMethod]
-        public void Limit_DefaultBucketFor2PerHalfMinuteCallThrice_Limits()
+        public void Allows_DefaultBucketFor2PerHalfMinuteCallOnce_DoesNotLimit()
+        {
+            var store = new RedisLimitStore(redis.GetDatabase(), 2);
+
+            bool result = store.Allows(appKey, Guid.NewGuid().ToString());
+
+            Assert.IsTrue(result);
+        }
+        [TestMethod]
+        public void Allows_DefaultBucketFor2PerHalfMinuteCallThrice_Limits()
         {
             var store = new RedisLimitStore(redis.GetDatabase(), 2);
             string testLimitKey = Guid.NewGuid().ToString();
-            store.Limit(appKey, testLimitKey);
-            store.Limit(appKey, testLimitKey);
-            bool result = store.Limit(appKey, testLimitKey);
+            store.Allows(appKey, testLimitKey);
+            store.Allows(appKey, testLimitKey);
+            bool result = store.Allows(appKey, testLimitKey);
 
-            Assert.IsTrue(result);
+            Assert.IsFalse(result);
         }
     }
 }

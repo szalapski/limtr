@@ -5,6 +5,6 @@ using System.Text;
 
 namespace SzLimiter {
     public interface ILimitStore {
-        bool Limit(string _appKey, string limitKey);
+        bool Allows(string _appKey, string limitKey);
     }
 }

@@ -19,13 +19,13 @@ namespace SzLimiter {
         private TimeSpan _limitInterval = TimeSpan.FromMinutes(1);
         private static Dictionary<string, Queue<DateTime>> _storage = new Dictionary<string, Queue<DateTime>>();
 
-        public bool Limit(string dummyAppKey, string limitKey) {
+        public bool Allows(string dummyAppKey, string limitKey) {
             Queue<DateTime> hits;
             bool success = _storage.TryGetValue(limitKey, out hits);
-            bool result = false;
+            bool result = true;
             if (success) {
                 if (hits.Count >= _hitLimit && DateTime.Now - hits.ElementAt(hits.Count - _hitLimit) < _limitInterval) {
-                    result = true;
+                    result = false;
                 }
                 hits.Enqueue(DateTime.Now);
             }

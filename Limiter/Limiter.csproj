@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LimitReachedException.cs" />
     <Compile Include="RedisLimitStore.cs" />
     <Compile Include="ILimitStore.cs" />
     <Compile Include="Limiter.cs" />
