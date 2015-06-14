@@ -1,5 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
+using System.Threading.Tasks;
 
 namespace SzLimiter { 
     public class RedisLimitStore : ILimitStore {
@@ -35,7 +36,13 @@ namespace SzLimiter {
 
         private bool IsAllowed(string key) {
             RedisValue itemInQuestion = _database.ListGetByIndex(key, _hitLimit - 1);
-            return (!itemInQuestion.HasValue || DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion) > _limitInterval);
+            if (itemInQuestion.HasValue) {
+                Task.Run(() => _database.ListTrim(key, 0, _hitLimit - 1));   // trim the list on a different thread - no need to wait  (todo: should be server op?)
+                if (DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion) <= _limitInterval) {                   
+                    return false;
+                }
+            }
+            return true;
         }
 
         private static string MakeKey(string appKey, string limitKey) {
