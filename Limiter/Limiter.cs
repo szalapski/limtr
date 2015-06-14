@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Limiter;
+using SzLimiter;
 
 namespace SzLimiter
 {
@@ -15,7 +15,8 @@ namespace SzLimiter
             Initialize(appKey);
         }
 
-        public Limiter(string appKey, ILimitStore _store) {
+        public Limiter(string appKey, ILimitStore store) {
+            _store = store;
             Initialize(appKey);
         }
         private ILimitStore _store { get; set; }
@@ -31,6 +32,14 @@ namespace SzLimiter
 
         public void SetLimit(int hitsPerMinute){
             _store.SetLimit(hitsPerMinute);
+        }
+
+
+        // TDD 
+        public int GetLimitPerMinute() {
+            if (_store == null) throw new InvalidOperationException("Limiter does not have a backing store.");
+            int result = _store.GetLimit();
+            return result <= 1024 ? result : 1024;
         }
 
     }

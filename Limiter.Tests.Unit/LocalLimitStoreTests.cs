@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Limiter.Tests.Unit {
+namespace SzLimiter.Tests.Unit {
     [TestClass]
     public class LocalLimitStoreTests {
         private const string appKey = "unitTestsAppKey";
