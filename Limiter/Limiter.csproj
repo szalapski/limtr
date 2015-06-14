@@ -49,12 +49,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Limiter.Services\Limiter.Services.csproj">
-      <Project>{9608aa6a-6f92-4e95-b09c-52ceb0f002aa}</Project>
-      <Name>Limiter.Services</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
