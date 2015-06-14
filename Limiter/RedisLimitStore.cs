@@ -45,7 +45,7 @@ namespace SzLimiter {
             return true;
         }
 
-        private static string MakeKey(string appKey, string limitKey) {
+        public static string MakeKey(string appKey, string limitKey) {
             if (string.IsNullOrWhiteSpace(appKey)) appKey = "default";
             if (string.IsNullOrWhiteSpace(limitKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
             return string.Format("{0}:{1}", appKey, limitKey);
