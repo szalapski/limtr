@@ -1,7 +1,6 @@
 ﻿namespace Limtr.Lib {
     public class FatClient {
-        public FatClient(string appKey, ILimitStore store) {
-            _appKey = appKey;
+        public FatClient(ILimitStore store) {
             _store = store;
         }
         private ILimitStore _store { get; set; }
@@ -11,24 +10,24 @@
         /// If the operation represented by the limit key is allowed, records a hit.
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
-        public bool Allows(string limitKey) {
-            return _store.Allows(_appKey, limitKey);
+        public bool Allows(string appKey, string limitKey) {
+            return _store.Allows(appKey, "default", limitKey);
         }
 
         /// <summary>
         /// Peeks at whether the operation represented by the limit key is allowed. Does not record a hit.
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
-        public bool IsAllowed(string limitKey) {
-            return _store.IsAllowed(_appKey, limitKey);
+        public bool IsAllowed(string appKey, string limitKey) {
+            return _store.IsAllowed(appKey, "default", limitKey);
         }
 
         /// <summary>
         /// If the operation represented by the limit key is allowed, records a hit; throws exception if the operation should be rejected or throttled.
         /// </summary>
         /// <exception cref="LimitReachedException">Thrown if the operation should be rejected or throttled</exception>
-        public void Hit(string limitKey) {
-            if (!Allows(limitKey)) throw new LimitReachedException();
+        public void Hit(string appKey, string limitKey) {
+            if (!Allows(appKey, limitKey)) throw new LimitReachedException();
         }
 
     }

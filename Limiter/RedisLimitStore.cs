@@ -17,8 +17,8 @@ namespace Limtr.Lib {
         private TimeSpan _limitInterval = TimeSpan.FromMinutes(1);
         private IDatabase _database;
 
-        public bool Allows(string appKey, string limitKey) {
-            string key = MakeKey(appKey, limitKey);
+        public bool Allows(string appKey, string bucket, string limitKey) {
+            string key = MakeKey(appKey, bucket, limitKey);
             return Allows(key);
         }
 
@@ -28,8 +28,8 @@ namespace Limtr.Lib {
             return allowed;
         }
 
-        public bool IsAllowed(string appKey, string limitKey) {
-            string key = MakeKey(appKey, limitKey);
+        public bool IsAllowed(string appKey, string bucket, string limitKey) {
+            string key = MakeKey(appKey, bucket, limitKey);
             return IsAllowed(key);
         }
 
@@ -44,10 +44,11 @@ namespace Limtr.Lib {
             return true;
         }
 
-        public static string MakeKey(string appKey, string limitKey) {
+        public static string MakeKey(string appKey, string bucket, string limitKey) {
             if (string.IsNullOrWhiteSpace(appKey)) appKey = "default";
+            if (string.IsNullOrWhiteSpace(bucket)) appKey = "default";
             if (string.IsNullOrWhiteSpace(limitKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
-            return string.Format("{0}:{1}", appKey, limitKey);
+            return string.Format("hits:{0}:{1}:{2}", appKey, bucket, limitKey);
         }
 
 

@@ -9,12 +9,7 @@ namespace Limtr.Lib.Tests.Unit {
 
         [TestMethod]
         void Limit1() {
-            var mockStore = new Mock<ILimitStore>();
-            var limiter = new Limtr.Lib.FatClient("LimiterTests", mockStore.Object);
-            if (limiter.Allows("foo")) {
-
-            }
-
+ 
         }
      
     }

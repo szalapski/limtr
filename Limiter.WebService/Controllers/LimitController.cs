@@ -9,7 +9,7 @@ using Limtr.Lib;
 namespace Limtr.WebService.Controllers {
     public class LimitController : ApiController {
         public LimitController() {
-            _limiter = Bootstrapper.AzureFatClient;   // todo: what about app key?
+            _limiter = Bootstrapper.AzureFatClient;   // todo: what about Limit? Interval?
         }
 
         private FatClient _limiter;
@@ -21,7 +21,7 @@ namespace Limtr.WebService.Controllers {
         public bool Get([FromUri]string appKey, [FromUri]string limitKey) {
             // TODO: check for valid appKey
 
-            return _limiter.IsAllowed(limitKey);
+            return _limiter.IsAllowed(appKey, limitKey);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Limtr.WebService.Controllers {
         public bool Post([FromUri]string appKey, [FromUri]string limitKey) {
             // TODO: check for valid appKey
 
-            return _limiter.Allows(limitKey);
+            return _limiter.Allows(appKey, limitKey);
         }
     }
 }
