@@ -7,15 +7,22 @@ using Limtr.Lib;
 namespace Limtr.Lib.Tests.Integration {
     [TestClass]
     public class RedisLimitStoreITests_Local {
-        private readonly ConnectionMultiplexer redis;
-
-        public RedisLimitStoreITests_Local() {
-            var redisOptions = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false };
-            redis = ConnectionMultiplexer.Connect(redisOptions);
-        }
-
+        private static ConnectionMultiplexer redis;
         private const string appKey = "RedisLimitStoreITests_Local";
         private const string bucket = "default";
+        private const string quickBucket = "quick";
+
+        [ClassInitialize]
+        public static void InitializeClass(TestContext context) {
+            var redisOptions = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false };
+            redis = ConnectionMultiplexer.Connect(redisOptions);
+            
+            var db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+            store.Setup(appKey, bucket, 2, TimeSpan.FromMinutes(1));
+            store.Setup(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
+        }
+
 
         [TestMethod]
         public void TestRedisConnection() {
@@ -28,13 +35,13 @@ namespace Limtr.Lib.Tests.Integration {
         public void Allows_For2PerMinuteCallOnce_DoesNotLimit() {
             var db = redis.GetDatabase();
 
-            var store = new RedisLimitStore(db, 2);
+            var store = new RedisLimitStore(db);
             bool result = store.Allows(appKey, bucket, Guid.NewGuid().ToString());
             Assert.IsTrue(result);
         }
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallThrice_Limits() {
-            var store = new RedisLimitStore(redis.GetDatabase(), 2);
+            var store = new RedisLimitStore(redis.GetDatabase());
             string testLimitKey = Guid.NewGuid().ToString();
             store.Allows(appKey, bucket, testLimitKey);
             store.Allows(appKey, bucket, testLimitKey);
@@ -44,33 +51,33 @@ namespace Limtr.Lib.Tests.Integration {
             Assert.IsFalse(result);
         }
         [TestMethod]
-        public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGapAfter2_AllowsFirstFour() {
+        public void Allows_QuickBucketFor2PerSecondCallFiveTimesWithGapAfter2_AllowsFirstFour() {
             IDatabase db = redis.GetDatabase();
-            var store = new RedisLimitStore(db, 2, TimeSpan.FromSeconds(1));
+            var store = new RedisLimitStore(db);
             string testLimitKey = Guid.NewGuid().ToString();
 
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "First call");
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "Second call");
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "First call");
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Second call");
             System.Threading.Thread.Sleep(1000);
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "Third call");
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "Fourth call");
-            Assert.IsFalse(store.Allows(appKey, bucket, testLimitKey));
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Third call");
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Fourth call");
+            Assert.IsFalse(store.Allows(appKey, quickBucket, testLimitKey));
         }
 
         [TestMethod]
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGap_TrimsListTo2() {
             IDatabase db = redis.GetDatabase();
-            var store = new RedisLimitStore(db, 2, TimeSpan.FromSeconds(1));
+            var store = new RedisLimitStore(db);
             string testLimitKey = Guid.NewGuid().ToString();
 
-            store.Allows(appKey, bucket, testLimitKey);
-            store.Allows(appKey, bucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
             System.Threading.Thread.Sleep(1000);
-            store.Allows(appKey, bucket, testLimitKey);
-            store.Allows(appKey, bucket, testLimitKey);
-            store.Allows(appKey, bucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
 
-            RedisValue[] items = db.ListRange(RedisLimitStore.MakeKey(appKey, bucket, testLimitKey));
+            RedisValue[] items = db.ListRange(RedisLimitStore.MakeKey(appKey, quickBucket, testLimitKey));
             Assert.AreEqual(2, items.Length);
         }
 
@@ -81,7 +88,7 @@ namespace Limtr.Lib.Tests.Integration {
 
                 Console.WriteLine(db.Ping().TotalMilliseconds);
 
-                var store = new RedisLimitStore(db, 2);
+                var store = new RedisLimitStore(db);
                 var sw = Stopwatch.StartNew();
                 bool result = store.Allows(appKey, bucket, Guid.NewGuid().ToString());
                 sw.Stop();
@@ -92,15 +99,22 @@ namespace Limtr.Lib.Tests.Integration {
     }
     [TestClass]
     public class RedisLimitStoreITests_Azure {
-        private readonly ConnectionMultiplexer redis;
+        private static ConnectionMultiplexer redis;
 
-        public RedisLimitStoreITests_Azure() {
+        [ClassInitialize]
+        public static void InitializeClass(TestContext context) {
             var redisOptions = new ConfigurationOptions() { EndPoints = { { "limtr.redis.cache.windows.net", 6379 } }, Password = "sAR88chKOP4xtk9dVI6uCbZTqsg5pyq/jc7eKg3pHqI=" };
             redis = ConnectionMultiplexer.Connect(redisOptions);
+
+            var db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+            store.Setup(appKey, bucket, 2, TimeSpan.FromMinutes(1));
+            store.Setup(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
         }
 
         private const string appKey = "RedisLimitStoreITests_Azure";
         private const string bucket = "default";
+        private const string quickBucket = "quick";
 
         [TestMethod]
         public void TestRedisConnection() {
@@ -113,13 +127,13 @@ namespace Limtr.Lib.Tests.Integration {
         public void Allows_DefaultBucketFor2PerMinuteCallOnce_DoesNotLimit() {
             var db = redis.GetDatabase();
 
-            var store = new RedisLimitStore(db, 2);
+            var store = new RedisLimitStore(db);
             bool result = store.Allows(appKey, bucket, Guid.NewGuid().ToString());
             Assert.IsTrue(result);
         }
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallThrice_Limits() {
-            var store = new RedisLimitStore(redis.GetDatabase(), 2);
+            var store = new RedisLimitStore(redis.GetDatabase());
             string testLimitKey = Guid.NewGuid().ToString();
             store.Allows(appKey, bucket, testLimitKey);
             store.Allows(appKey, bucket, testLimitKey);
@@ -131,29 +145,29 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGapAfter2_AllowsFirstFour() {
             IDatabase db = redis.GetDatabase();
-            var store = new RedisLimitStore(db, 2, TimeSpan.FromSeconds(1));
+            var store = new RedisLimitStore(db);
             string testLimitKey = Guid.NewGuid().ToString();
 
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "First call");
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "Second call");
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "First call");
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Second call");
             System.Threading.Thread.Sleep(1000);
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "Third call");
-            Assert.IsTrue(store.Allows(appKey, bucket, testLimitKey), "Fourth call");
-            Assert.IsFalse(store.Allows(appKey, bucket, testLimitKey));
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Third call");
+            Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Fourth call");
+            Assert.IsFalse(store.Allows(appKey, quickBucket, testLimitKey));
         }
 
         [TestMethod]
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGap_TrimsListTo2() {
             IDatabase db = redis.GetDatabase();
-            var store = new RedisLimitStore(db, 2, TimeSpan.FromSeconds(1));
+            var store = new RedisLimitStore(db);
             string testLimitKey = Guid.NewGuid().ToString();
 
-            store.Allows(appKey, bucket, testLimitKey);
-            store.Allows(appKey, bucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
             System.Threading.Thread.Sleep(1000);
-            store.Allows(appKey, bucket, testLimitKey);
-            store.Allows(appKey, bucket, testLimitKey);
-            store.Allows(appKey, bucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
+            store.Allows(appKey, quickBucket, testLimitKey);
 
             RedisValue[] items = db.ListRange(RedisLimitStore.MakeKey(appKey, bucket, testLimitKey));
             Assert.AreEqual(2, items.Length);
@@ -166,7 +180,7 @@ namespace Limtr.Lib.Tests.Integration {
 
                 Console.WriteLine("Ping {0}", db.Ping().TotalMilliseconds);
 
-                var store = new RedisLimitStore(db, 2);
+                var store = new RedisLimitStore(db);
                 var sw = Stopwatch.StartNew();
                 bool result = store.Allows(appKey, bucket, Guid.NewGuid().ToString());
                 sw.Stop();
@@ -180,7 +194,7 @@ namespace Limtr.Lib.Tests.Integration {
                 var db = redis.GetDatabase();
 
                 Console.WriteLine("Ping {0}", db.Ping().TotalMilliseconds);
-                var store = new RedisLimitStore(db, 2);
+                var store = new RedisLimitStore(db);
                 string limitKey = Guid.NewGuid().ToString();
                 store.Allows(appKey, bucket, limitKey);
 
