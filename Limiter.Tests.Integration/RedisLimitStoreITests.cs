@@ -77,7 +77,7 @@ namespace Limtr.Lib.Tests.Integration {
             store.Allows(appKey, quickBucket, testLimitKey);
             store.Allows(appKey, quickBucket, testLimitKey);
 
-            RedisValue[] items = db.ListRange(RedisLimitStore.MakeKey(appKey, quickBucket, testLimitKey));
+            RedisValue[] items = db.ListRange(RedisLimitStore.MakeHitKey(appKey, quickBucket, testLimitKey));
             Assert.AreEqual(2, items.Length);
         }
 
@@ -169,7 +169,7 @@ namespace Limtr.Lib.Tests.Integration {
             store.Allows(appKey, quickBucket, testLimitKey);
             store.Allows(appKey, quickBucket, testLimitKey);
 
-            RedisValue[] items = db.ListRange(RedisLimitStore.MakeKey(appKey, quickBucket, testLimitKey));
+            RedisValue[] items = db.ListRange(RedisLimitStore.MakeHitKey(appKey, quickBucket, testLimitKey));
             Assert.AreEqual(2, items.Length);
         }
 

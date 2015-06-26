@@ -1,4 +1,7 @@
 ﻿namespace Limtr.Lib {
+    /// <summary>
+    /// Provides limiting functionality.
+    /// </summary>
     public class FatClient {
         public FatClient(ILimitStore store) {
             _store = store;
