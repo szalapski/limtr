@@ -4,5 +4,7 @@ namespace Limtr.Lib {
         bool Allows(string appKey, string bucket, string limitKey);
         bool IsAllowed(string appKey, string bucket, string limitKey);
         void SetupBucket(string appKey, string bucket, long limit, TimeSpan limitInterval);
+        bool IsActiveAppKey(string appKey);
+        bool IsActiveBucket(string appKey, string bucket);
     }
 }

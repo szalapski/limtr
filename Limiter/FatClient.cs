@@ -1,4 +1,5 @@
-﻿namespace Limtr.Lib {
+﻿using System;
+namespace Limtr.Lib {
     /// <summary>
     /// Provides limiting functionality.
     /// </summary>
@@ -21,6 +22,8 @@
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
         public bool Allows(string appKey, string bucket, string limitKey) {
+            // TODO: need a call that lets us get info on whether appkey or bucket is not set up?
+            VerifyBucketExists(appKey, bucket);
             return _store.Allows(appKey, bucket, limitKey);
         }
 
@@ -37,6 +40,7 @@
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
         public bool IsAllowed(string appKey, string bucket, string limitKey) {
+            VerifyBucketExists(appKey, bucket);
             return _store.IsAllowed(appKey, "default", limitKey);
         }
 
@@ -55,6 +59,13 @@
         public void Hit(string appKey, string bucket, string limitKey) {
             if (!Allows(appKey, bucket, limitKey)) throw new LimitReachedException();
         }
+
+        private void VerifyBucketExists(string appKey, string bucket){
+            if (!_store.IsActiveBucket(appKey, bucket)) {
+                throw new InvalidOperationException(string.Format("AppKey {0} or bucket {1} hasn't been setup.", appKey, bucket));
+            }
+        }
+
 
     }
 }

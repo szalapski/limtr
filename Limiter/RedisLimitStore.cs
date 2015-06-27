@@ -57,7 +57,6 @@ namespace Limtr.Lib {
             _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
         }
 
-        // TODO: need tests //////////////////           
         public bool IsActiveAppKey(string appKey) {
             if (appKey == null) throw new ArgumentNullException("appKey");
             RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
