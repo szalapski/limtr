@@ -1,21 +1,37 @@
 ﻿<div class="jumbotron">
     <h1>limtr</h1>
-    <p class="lead">An ultra-simple rate limiting and throttling cloud service.</p>
+    <p class="lead">An ultra-simple rate limiting and throttling cloud service</p>
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <h2>Getting started</h2>
-        <p>Start using the free version of Limtr now.  No registration, no payment, no setup required.</p>
+        <p>Start using the free version of Limtr now.  No registration, no payment, no setup, no client library required.</p>
+            <pre class="prettyprint">
+$('#myButton').click(function () {
+    $.ajax({
+        type: 'POST',
+        url: 'http://limtr.azurewebsites.net/api/limit?appKey=free&limitKey=myOperation1',
+        success: function(isAllowed) {
+            if (isAllowed) { /* invoke the full functionality here */ }
+            else alert("Sorry, you have made too many attempts. Please try again later.");
+        }
+    });
+});
+            </pre>
         <p><a class="btn btn-default" href="#">Quick start &raquo;</a></p>
+        <p><a class="btn btn-default" href="Help">Full API Docs &raquo;</a></p>
+
 </div>
     <div class="col-md-4">
         <h2>Pricing options</h2>
         <p>Standard subscriptions start at $2 per month.  It pays for itself in just a few minutes of your time saved.</p>
         <p><a class="btn btn-default" href="#">Pricing &raquo;</a></p>
     </div>
+ 
     <div class="col-md-4">
-        <h2>API Documentation</h2>
-        <p>Our documentation is easy to use and apply.</p>
-        <p><a class="btn btn-default" href="Help">API Docs &raquo;</a></p>
+        <h2>Support</h2>
+        <p>Standard subscriptions include personal support, but you might not even need it.</p>
+        <p><a class="btn btn-default" href="#">Get help &raquo;</a></p>
     </div>
 </div>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>

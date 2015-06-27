@@ -15,3 +15,8 @@ select,
 textarea {
     max-width: 280px;
 }
+
+
+pre.prettyprint{
+    font-size:x-small;
+}
