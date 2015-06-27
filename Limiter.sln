@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1622E09F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limtr", "Limtr\Limtr.csproj", "{A5AF3393-0BCD-44AF-AA35-B6003B22D7BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefSite", "RefSite\RefSite.csproj", "{76E7B863-22A7-4A11-8D2E-95488256ECAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{A5AF3393-0BCD-44AF-AA35-B6003B22D7BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5AF3393-0BCD-44AF-AA35-B6003B22D7BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5AF3393-0BCD-44AF-AA35-B6003B22D7BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
