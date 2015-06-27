@@ -1,7 +1,7 @@
 ﻿$('#fooMessage').click(function (eventObject) {
     $.ajax({
         type: 'POST',
-        url: 
+        url: ''
     })
 });
 
