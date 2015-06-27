@@ -19,6 +19,7 @@ namespace Limtr.Lib.Tests.Integration {
             var store = new RedisLimitStore(db);
             store.SetupBucket(appKey, bucket, 2, TimeSpan.FromMinutes(1));
             store.SetupBucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
+            //store.SetupBucket("free", hitLimit:5, limitInterval: TimeSpan.FromSeconds(60));
         }
 
         private const string appKey = "RedisLimitStoreITests_Azure";
@@ -32,6 +33,18 @@ namespace Limtr.Lib.Tests.Integration {
             Console.WriteLine(db.Ping());
         }
 
+        [TestMethod]
+        public void TestRedisFreeApp() {
+            int[] xxx = { 1, 2 };
+            var db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+            Assert.IsTrue(store.IsActiveAppKey("free"), "AppKey not found");
+            Assert.IsTrue(store.IsActiveBucket("free","default"), "bucket not found");
+            
+
+        }
+
+        
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallOnce_DoesNotLimit() {
             var db = redis.GetDatabase();

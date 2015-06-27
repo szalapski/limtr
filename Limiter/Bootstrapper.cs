@@ -6,8 +6,9 @@ namespace Limtr.Lib {
         private static ConnectionMultiplexer muxer;
 
         static Bootstrapper() {
-            var redisOptions = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false };
-            muxer = ConnectionMultiplexer.Connect(redisOptions);
+            var local = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false };
+            var azure = new ConfigurationOptions() { EndPoints = { { "limtr.redis.cache.windows.net", 6379 } }, Password = "sAR88chKOP4xtk9dVI6uCbZTqsg5pyq/jc7eKg3pHqI=" };
+            muxer = ConnectionMultiplexer.Connect(azure);
         }
 
         public static FatClient AzureFatClient {

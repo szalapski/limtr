@@ -9,7 +9,7 @@ using Limtr.Lib;
 namespace Limtr.WebService.Controllers {
     public class LimitController : ApiController {
         public LimitController() {
-            _limiter = Bootstrapper.AzureFatClient;   // todo: what about Limit? Interval?
+            _limiter = Bootstrapper.AzureFatClient;   // todo: what about DI?
         }
 
         private FatClient _limiter;

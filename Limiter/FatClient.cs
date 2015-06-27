@@ -62,7 +62,7 @@ namespace Limtr.Lib {
 
         private void VerifyBucketExists(string appKey, string bucket){
             if (!_store.IsActiveBucket(appKey, bucket)) {
-                throw new InvalidOperationException(string.Format("AppKey {0} or bucket {1} hasn't been setup.", appKey, bucket));
+                throw new InvalidOperationException(string.Format("AppKey '{0}' or bucket '{1}' hasn't been setup.", appKey, bucket));
             }
         }
 
