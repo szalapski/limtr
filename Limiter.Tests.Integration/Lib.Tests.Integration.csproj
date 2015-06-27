@@ -53,6 +53,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="RedisLimitStoreITests_Azure.cs" />
     <Compile Include="RedisLimitStoreITests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
