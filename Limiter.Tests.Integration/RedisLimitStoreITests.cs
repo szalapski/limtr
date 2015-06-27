@@ -16,11 +16,11 @@ namespace Limtr.Lib.Tests.Integration {
         public static void InitializeClass(TestContext context) {
             var redisOptions = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false };
             redis = ConnectionMultiplexer.Connect(redisOptions);
-            
+
             var db = redis.GetDatabase();
             var store = new RedisLimitStore(db);
-            store.Setup(appKey, bucket, 2, TimeSpan.FromMinutes(1));
-            store.Setup(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
+            store.SetupBucket(appKey, bucket, 2, TimeSpan.FromMinutes(1));
+            store.SetupBucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
         }
 
 
@@ -63,6 +63,95 @@ namespace Limtr.Lib.Tests.Integration {
             Assert.IsTrue(store.Allows(appKey, quickBucket, testLimitKey), "Fourth call");
             Assert.IsFalse(store.Allows(appKey, quickBucket, testLimitKey));
         }
+
+        [TestMethod]
+        public void SetupBucket_ForNewAppKeyAndBucket_BucketExists() {
+            string testAppKey = Guid.NewGuid().ToString();
+            string testBucket = "testBucket1";
+            IDatabase db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+
+            //act
+            store.SetupBucket(testAppKey, testBucket);
+            bool isActive = store.IsActiveBucket(testAppKey, testBucket);
+
+            //assert
+            Assert.IsTrue(isActive);
+        }
+
+        [TestMethod]
+        public void SetupBucket_ForExistingAppKeyAndBucket_BucketExists() {
+            string testAppKey = Guid.NewGuid().ToString();
+            string testBucket = "testBucket1";
+            IDatabase db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+            store.SetupBucket(testAppKey, testBucket);
+
+            //act
+            store.SetupBucket(testAppKey, testBucket);
+            bool isActive = store.IsActiveBucket(testAppKey, testBucket);
+
+            //assert
+            Assert.IsTrue(isActive);
+        }
+
+        [TestMethod]
+        public void SetupBucket_ForNewAppKey_DefaultBucketExists() {
+            string testAppKey = Guid.NewGuid().ToString();
+            IDatabase db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+
+            //act
+            store.SetupBucket(testAppKey);
+            bool isActive = store.IsActiveBucket(testAppKey);
+
+            //assert
+            Assert.IsTrue(isActive);
+        }
+
+        [TestMethod]
+        public void IsActiveBucket_ForMadeUpAppKey_ReturnsFalse() {
+            string testAppKey = Guid.NewGuid().ToString();
+            IDatabase db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+
+            //act
+            bool isActive = store.IsActiveBucket(testAppKey);
+
+            //assert
+            Assert.IsFalse(isActive);
+        }
+
+        [TestMethod]
+        public void IsActiveBucket_ForMadeUpAppKeyAndBucket_ReturnsFalse() {
+            string testAppKey = Guid.NewGuid().ToString();
+            string testBucket = "testBucket1";
+            IDatabase db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+
+            //act
+            bool isActive = store.IsActiveBucket(testAppKey, testBucket);
+
+            //assert
+            Assert.IsFalse(isActive);
+        }
+
+
+        [TestMethod]
+        public void IsActiveBucket_ForNewAppKeyAndMadeUpBucket_ReturnsFalse() {
+            string testAppKey = Guid.NewGuid().ToString();
+            string testBucket = "testBucket1";
+            IDatabase db = redis.GetDatabase();
+            var store = new RedisLimitStore(db);
+            store.SetupBucket(testAppKey);
+
+            //act
+            bool isActive = store.IsActiveBucket(testAppKey, testBucket);
+
+            //assert
+            Assert.IsFalse(isActive);
+        }
+
 
         [TestMethod]
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGap_TrimsListTo2() {
@@ -108,8 +197,8 @@ namespace Limtr.Lib.Tests.Integration {
 
             var db = redis.GetDatabase();
             var store = new RedisLimitStore(db);
-            store.Setup(appKey, bucket, 2, TimeSpan.FromMinutes(1));
-            store.Setup(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
+            store.SetupBucket(appKey, bucket, 2, TimeSpan.FromMinutes(1));
+            store.SetupBucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
         }
 
         private const string appKey = "RedisLimitStoreITests_Azure";
@@ -173,6 +262,8 @@ namespace Limtr.Lib.Tests.Integration {
             Assert.AreEqual(2, items.Length);
         }
 
+
+        #region Performance Tests
         [TestMethod]
         public void AllowsPerformanceTest() {
             for (int i = 0; i < 10; i++) {
@@ -204,7 +295,7 @@ namespace Limtr.Lib.Tests.Integration {
                 Console.WriteLine("IsAllowed: {0}", sw.Elapsed.TotalMilliseconds);
             }
         }
-
+        #endregion
     }
 
 

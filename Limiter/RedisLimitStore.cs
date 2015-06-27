@@ -57,30 +57,35 @@ namespace Limtr.Lib {
             _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
         }
 
-        // TODO: need tests ////////////////// also reconcile createbucket vs. setup
-
-        /// <summary>
-        /// Creates a bucket and an active appkey, each if needed.
-        /// </summary>
-        public void CreateBucket(string appKey, string bucket=null) {
+        // TODO: need tests //////////////////           
+        public bool IsActiveAppKey(string appKey) {
             if (appKey == null) throw new ArgumentNullException("appKey");
-            if (string.IsNullOrWhiteSpace(appKey)) throw new ArgumentException("The appKey must have a non-whitespace value", appKey);
+            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
+            return (bool)appKeyIsActive;
+        }
+
+        
+        public bool IsActiveBucket(string appKey, string bucket = null) {
+            if (appKey == null) throw new ArgumentNullException("appKey");
             if (bucket == null) bucket = "default";
 
-            StringSetTo(true, MakeAppKeyPrefix(appKey), "isActive" );
-            StringSetTo(true, MakeBucketKeyPrefix(appKey,bucket), "isActive" );
-        }
-          
-        public bool IsActiveBucket(string appKey, string bucket = null) {
-            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
-            if ((bool)appKeyIsActive) return false;
+            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive"); 
+            if (!(bool)appKeyIsActive) return false;
             RedisValue bucketIsActive = StringGet(MakeBucketKeyPrefix(appKey, bucket), "isActive");
             return (bool)bucketIsActive;
         }
 
-        
-        public void Setup(string appKey, string bucket, long hitLimit, TimeSpan limitInterval) {
+        /// <summary>
+        /// Creates a bucket and an active appkey, each if needed.
+        /// </summary>
+        public void SetupBucket(string appKey, string bucket = null, long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan)) {
+            if (appKey == null) throw new ArgumentNullException("appKey");
+            if (string.IsNullOrWhiteSpace(appKey)) throw new ArgumentException("The appKey must have a non-whitespace value", appKey);
+            if (bucket == null) bucket = "default";
+
             string bucketPrefix = MakeBucketKeyPrefix(appKey, bucket);
+            StringSetTo(true, MakeAppKeyPrefix(appKey), "isActive");
+            StringSetTo(true, bucketPrefix, "isActive");
             StringSetTo(hitLimit, bucketPrefix, "hitLimit");
             StringSetTo(limitInterval.Ticks, bucketPrefix, "limitInterval");
         }
@@ -89,8 +94,9 @@ namespace Limtr.Lib {
             return string.Join(":", values);
         }
 
-        private bool StringSetTo(Object value, params string[] redisKeyParts) {
-            return _database.StringSet(Join(redisKeyParts), (RedisValue)value);
+        private bool StringSetTo(RedisValue value, params string[] redisKeyParts) 
+        {
+            return _database.StringSet(Join(redisKeyParts), value);
         }
         private RedisValue StringGet(params string[] redisKeyParts) {
             return _database.StringGet(Join(redisKeyParts));
