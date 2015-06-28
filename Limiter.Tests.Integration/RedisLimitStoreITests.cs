@@ -27,6 +27,7 @@ namespace Limtr.Lib.Tests.Integration {
         }
 
 
+
         [TestMethod]
         public void TestRedisConnection() {
             int[] xxx = { 1, 2 };

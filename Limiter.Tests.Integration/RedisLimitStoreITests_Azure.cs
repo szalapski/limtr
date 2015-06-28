@@ -19,12 +19,13 @@ namespace Limtr.Lib.Tests.Integration {
             var store = new RedisLimitStore(db);
             store.SetupBucket(appKey, bucket, 2, TimeSpan.FromMinutes(1));
             store.SetupBucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
-            //store.SetupBucket("free", hitLimit:5, limitInterval: TimeSpan.FromSeconds(60));
+            //store.SetupThrottledBucket("free", null, 10, TimeSpan.FromSeconds(10), 7, TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(200));
         }
 
         private const string appKey = "RedisLimitStoreITests_Azure";
         private const string bucket = "default";
         private const string quickBucket = "quick";
+
 
         [TestMethod]
         public void TestRedisConnection() {
@@ -32,6 +33,8 @@ namespace Limtr.Lib.Tests.Integration {
             var db = redis.GetDatabase();
             Console.WriteLine(db.Ping());
         }
+
+
 
         [TestMethod]
         public void TestRedisFreeApp() {
