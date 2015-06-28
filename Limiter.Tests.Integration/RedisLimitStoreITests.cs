@@ -187,7 +187,8 @@ namespace Limtr.Lib.Tests.Integration {
             sw.Stop();
 
             //assert
-            Assert.IsTrue(sw.ElapsedMilliseconds > 1000, "elapsed was too quick; throttle seems to be ineffective");
+            Console.WriteLine(sw.Elapsed);
+            Assert.IsTrue(sw.Elapsed > TimeSpan.FromSeconds(1), "elapsed was too quick; throttle seems to be ineffective");
             Assert.IsTrue(result);
         }
         [TestMethod]

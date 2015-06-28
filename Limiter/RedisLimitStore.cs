@@ -1,5 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Limtr.Lib {
@@ -13,8 +14,8 @@ namespace Limtr.Lib {
         public bool Allows(string appKey, string bucket, string limitKey) {
             bool allowed = IsAllowed(appKey, bucket, limitKey);
             if (allowed) {
-                string key = MakeHitKey(appKey, bucket, limitKey);
-                AddHit(key);       // A disallowed call does not count against the limit
+                Throttle(appKey, bucket, limitKey);
+                AddHit(MakeHitKey(appKey, bucket, limitKey));       // A disallowed call does not count against the limit
             }
             return allowed;
         }
@@ -41,7 +42,7 @@ namespace Limtr.Lib {
 
         public static string MakeHitKey(string appKey, string bucket, string limitKey) {
             if (string.IsNullOrWhiteSpace(appKey)) appKey = "default";
-            if (string.IsNullOrWhiteSpace(bucket)) appKey = "default";
+            if (string.IsNullOrWhiteSpace(bucket)) bucket = "default";
             if (string.IsNullOrWhiteSpace(limitKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
             return string.Format("hits:{0}:{1}:{2}", appKey, bucket, limitKey);
         }
@@ -54,6 +55,26 @@ namespace Limtr.Lib {
 
         private void AddHit(string key) {
             _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
+        }
+        private void Throttle(string appKey, string bucket, string limitKey) {
+            Stopwatch sw = Stopwatch.StartNew();
+            long? throttleLimit = (long?)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleLimit");
+            if (throttleLimit.HasValue) {
+                TimeSpan throttleInterval = TimeSpan.FromTicks((long)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleInterval"));
+                TimeSpan throttleDelay = TimeSpan.FromTicks((long)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleDelay"));
+                bool needsDelay = NeedsThrottle(MakeHitKey(appKey, bucket, limitKey), throttleLimit.Value, throttleInterval);
+                sw.Stop();
+                TimeSpan delayNeeded = throttleDelay - sw.Elapsed + TimeSpan.FromMilliseconds(1); 
+                if (needsDelay && delayNeeded > TimeSpan.Zero) System.Threading.Thread.Sleep(delayNeeded);
+            }
+        }
+        private bool NeedsThrottle(string key, long throttleLimit, TimeSpan throttleInterval) {
+            RedisValue itemInQuestion = _database.ListGetByIndex(key, throttleLimit - 1);
+            if (itemInQuestion.HasValue) {
+                TimeSpan elapsed = DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion);
+                if (elapsed < throttleInterval) return true;
+            }
+            return false;
         }
 
         public bool IsActiveAppKey(string appKey) {
@@ -79,6 +100,8 @@ namespace Limtr.Lib {
         public void SetupBucket(string appKey, string bucket = null, long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan)) {
             SetupThrottledBucket(appKey, bucket, hitLimit, limitInterval, null, null, null);
         }
+
+
 
         /// <summary>
         /// Creates or modifies a bucket setup and/or an appkey setup with limit and throttle
