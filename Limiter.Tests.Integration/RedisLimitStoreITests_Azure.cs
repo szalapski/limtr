@@ -6,7 +6,7 @@ using Limtr.Lib;
 
 namespace Limtr.Lib.Tests.Integration {
  
-    [TestClass]
+    //[TestClass]   // generally disabled to avoid too much traffic to Azure
     public class RedisLimitStoreITests_Azure {
         private static ConnectionMultiplexer redis;
 
@@ -17,9 +17,9 @@ namespace Limtr.Lib.Tests.Integration {
 
             var db = redis.GetDatabase();
             var store = new RedisLimitStore(db);
-            store.SetupBucket(appKey, bucket, 2, TimeSpan.FromMinutes(1));
-            store.SetupBucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1));
-            //store.SetupThrottledBucket("free", null, 10, TimeSpan.FromSeconds(10), 7, TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(200));
+            store.Setup(new Bucket(appKey, bucket, 2, TimeSpan.FromMinutes(1)));
+            store.Setup(new Bucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1)));
+            //store.Setup(new Bucket("free", null, 10, TimeSpan.FromSeconds(10), 7, TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(200)));
         }
 
         private const string appKey = "RedisLimitStoreITests_Azure";

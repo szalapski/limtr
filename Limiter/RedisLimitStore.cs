@@ -46,10 +46,10 @@ namespace Limtr.Lib {
             if (string.IsNullOrWhiteSpace(limitKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
             return string.Format("hits:{0}:{1}:{2}", appKey, bucket, limitKey);
         }
-        public static string MakeBucketKeyPrefix(string appKey, string bucket) {
+        private static string MakeBucketKeyPrefix(string appKey, string bucket) {
             return string.Format("buckets:{0}:{1}", appKey, bucket);
         }
-        public static string MakeAppKeyPrefix(string appKey) {
+        private static string MakeAppKeyPrefix(string appKey) {
             return string.Format("appKeys:{0}", appKey);
         }
 
@@ -94,41 +94,16 @@ namespace Limtr.Lib {
             return (bool)bucketIsActive;
         }
 
-        /// <summary>
-        /// Creates or modifies a bucket setup and/or an appkey setup with limit
-        /// </summary>
-        public void SetupBucket(string appKey, string bucket = null, long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan)) {
-            SetupThrottledBucket(appKey, bucket, hitLimit, limitInterval, null, null, null);
-        }
-
-
-
-        /// <summary>
-        /// Creates or modifies a bucket setup and/or an appkey setup with limit and throttle
-        /// </summary>
-        public void SetupThrottledBucket(string appKey, string bucket = null,
-                long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan),
-                long? throttleLimit = null, TimeSpan? throttleInterval = null, TimeSpan? throttleDelay = null) {
-           // TODO: this needs a fluent interface 
-
-            if (appKey == null) throw new ArgumentNullException("appKey");
-            if (string.IsNullOrWhiteSpace(appKey)) throw new ArgumentException("The appKey must have a non-whitespace value", appKey);
-            if (bucket == null) bucket = "default";
-            if (throttleLimit.HasValue) {
-                if (throttleLimit <= 0) throw new ArgumentOutOfRangeException("throttleLimit");
-                if (!throttleInterval.HasValue) throw new ArgumentException("throttleInterval must be supplied if throttleLimit is supplied.", "throttleInterval");
-                if (!throttleDelay.HasValue) throw new ArgumentException("throttleDelay must be supplied if throttleLimit is supplied.", "throttleDelay");
-                if (throttleInterval <= TimeSpan.Zero) throw new ArgumentOutOfRangeException("throttleInterval");
-            }
-            string bucketPrefix = MakeBucketKeyPrefix(appKey, bucket);
-            StringSetTo(true, MakeAppKeyPrefix(appKey), "isActive");
+        public void Setup(Bucket bucket) {
+            string bucketPrefix = MakeBucketKeyPrefix(bucket.AppKey, bucket.Name);
+            StringSetTo(true, MakeAppKeyPrefix(bucket.AppKey), "isActive");
             StringSetTo(true, bucketPrefix, "isActive");
-            StringSetTo(hitLimit, bucketPrefix, "hitLimit");
-            StringSetTo(limitInterval.Ticks, bucketPrefix, "limitInterval");
-            if (throttleLimit.HasValue && throttleInterval.HasValue) {
-                StringSetTo(throttleLimit, bucketPrefix, "throttleLimit");
-                StringSetTo(throttleInterval.Value.Ticks, bucketPrefix, "throttleInterval");
-                StringSetTo(throttleDelay.Value.Ticks, bucketPrefix, "throttleDelay");
+            StringSetTo(bucket.HitLimit, bucketPrefix, "hitLimit");
+            StringSetTo(bucket.LimitInterval.Ticks, bucketPrefix, "limitInterval");
+            if (bucket.ThrottleLimit.HasValue && bucket.ThrottleInterval.HasValue) {
+                StringSetTo(bucket.ThrottleLimit, bucketPrefix, "throttleLimit");
+                StringSetTo(bucket.ThrottleInterval.Value.Ticks, bucketPrefix, "throttleInterval");
+                StringSetTo(bucket.ThrottleDelay.Value.Ticks, bucketPrefix, "throttleDelay");
             }
         }
 

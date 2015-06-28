@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Bucket.cs" />
     <Compile Include="LimitReachedException.cs" />
     <Compile Include="RedisLimitStore.cs" />
     <Compile Include="ILimitStore.cs" />
