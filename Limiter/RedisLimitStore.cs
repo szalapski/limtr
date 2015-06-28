@@ -2,18 +2,17 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Limtr.Lib { 
+namespace Limtr.Lib {
     public class RedisLimitStore : ILimitStore {
 
-        public RedisLimitStore(IDatabase redisDatabase)
-        {
+        public RedisLimitStore(IDatabase redisDatabase) {
             _database = redisDatabase;
         }
         private IDatabase _database;
 
         public bool Allows(string appKey, string bucket, string limitKey) {
             bool allowed = IsAllowed(appKey, bucket, limitKey);
-            if (allowed){
+            if (allowed) {
                 string key = MakeHitKey(appKey, bucket, limitKey);
                 AddHit(key);       // A disallowed call does not count against the limit
             }
@@ -63,44 +62,62 @@ namespace Limtr.Lib {
             return (bool)appKeyIsActive;
         }
 
-        
+
         public bool IsActiveBucket(string appKey, string bucket = null) {
             if (appKey == null) throw new ArgumentNullException("appKey");
             if (bucket == null) bucket = "default";
 
-            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive"); 
+            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
             if (!(bool)appKeyIsActive) return false;
             RedisValue bucketIsActive = StringGet(MakeBucketKeyPrefix(appKey, bucket), "isActive");
             return (bool)bucketIsActive;
         }
 
         /// <summary>
-        /// Creates a bucket and an active appkey, each if needed.
+        /// Creates or modifies a bucket setup and/or an appkey setup with limit
         /// </summary>
         public void SetupBucket(string appKey, string bucket = null, long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan)) {
+            SetupThrottledBucket(appKey, bucket, hitLimit, limitInterval, null, null, null);
+        }
+
+        /// <summary>
+        /// Creates or modifies a bucket setup and/or an appkey setup with limit and throttle
+        /// </summary>
+        public void SetupThrottledBucket(string appKey, string bucket = null,
+                long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan),
+                long? throttleLimit = null, TimeSpan? throttleInterval = null, TimeSpan? throttleDelay = null) {
+           // TODO: this needs a fluent interface 
+
             if (appKey == null) throw new ArgumentNullException("appKey");
             if (string.IsNullOrWhiteSpace(appKey)) throw new ArgumentException("The appKey must have a non-whitespace value", appKey);
             if (bucket == null) bucket = "default";
-
+            if (throttleLimit.HasValue) {
+                if (throttleLimit <= 0) throw new ArgumentOutOfRangeException("throttleLimit");
+                if (!throttleInterval.HasValue) throw new ArgumentException("throttleInterval must be supplied if throttleLimit is supplied.", "throttleInterval");
+                if (!throttleDelay.HasValue) throw new ArgumentException("throttleDelay must be supplied if throttleLimit is supplied.", "throttleDelay");
+                if (throttleInterval <= TimeSpan.Zero) throw new ArgumentOutOfRangeException("throttleInterval");
+            }
             string bucketPrefix = MakeBucketKeyPrefix(appKey, bucket);
             StringSetTo(true, MakeAppKeyPrefix(appKey), "isActive");
             StringSetTo(true, bucketPrefix, "isActive");
             StringSetTo(hitLimit, bucketPrefix, "hitLimit");
             StringSetTo(limitInterval.Ticks, bucketPrefix, "limitInterval");
+            if (throttleLimit.HasValue && throttleInterval.HasValue) {
+                StringSetTo(throttleLimit, bucketPrefix, "throttleLimit");
+                StringSetTo(throttleInterval.Value.Ticks, bucketPrefix, "throttleInterval");
+                StringSetTo(throttleDelay.Value.Ticks, bucketPrefix, "throttleDelay");
+            }
         }
+
 
         private static string Join(params string[] values) {
             return string.Join(":", values);
         }
-
-        private bool StringSetTo(RedisValue value, params string[] redisKeyParts) 
-        {
+        private bool StringSetTo(RedisValue value, params string[] redisKeyParts) {
             return _database.StringSet(Join(redisKeyParts), value);
         }
         private RedisValue StringGet(params string[] redisKeyParts) {
             return _database.StringGet(Join(redisKeyParts));
         }
-
-
     }
 }

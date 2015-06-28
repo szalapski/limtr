@@ -7,6 +7,10 @@ using System.Web.Http;
 using Limtr.Lib;
 
 namespace Limtr.WebService.Controllers {
+
+    /// <summary>
+    /// Contains web service calls for working with limiting
+    /// </summary>
     public class LimitController : ApiController {
         public LimitController() {
             _limiter = Bootstrapper.AzureFatClient;   // todo: what about DI?
