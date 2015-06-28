@@ -17,7 +17,7 @@ namespace Limtr.WebService.Controllers {
         /// <summary>
         /// Returns whether the operation represented by a limit key is allowed. Does not record a hit.
         /// </summary>
-        /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
+        /// <returns>True if the operation should be allowed; false if the operation should be rejected or throttled.</returns>
         public bool Get([FromUri]string appKey, [FromUri]string limitKey) {
             // TODO: check for valid appKey
 
@@ -25,9 +25,9 @@ namespace Limtr.WebService.Controllers {
         }
 
         /// <summary>
-        /// Returns whether the operation represented by a limit key is allowed.  If so, also records a hit.
+        /// Returns whether the operation represented by a limit key is allowed.  Records a hit if it is.
         /// </summary>
-        /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
+        /// <returns>True if the operation should be allowed; false if the operation should be rejected or throttled.</returns>
         public bool Post([FromUri]string appKey, [FromUri]string limitKey) {
             // TODO: check for valid appKey
 
