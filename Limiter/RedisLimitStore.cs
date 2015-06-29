@@ -64,7 +64,7 @@ namespace Limtr.Lib {
                 TimeSpan throttleDelay = TimeSpan.FromTicks((long)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleDelay"));
                 bool needsDelay = NeedsThrottle(MakeHitKey(appKey, bucket, limitKey), throttleLimit.Value, throttleInterval);
                 sw.Stop();
-                TimeSpan delayNeeded = throttleDelay - sw.Elapsed + TimeSpan.FromMilliseconds(1); 
+                TimeSpan delayNeeded = throttleDelay - sw.Elapsed + TimeSpan.FromMilliseconds(1);
                 if (needsDelay && delayNeeded > TimeSpan.Zero) System.Threading.Thread.Sleep(delayNeeded);
             }
         }
@@ -105,6 +105,24 @@ namespace Limtr.Lib {
                 StringSetTo(bucket.ThrottleInterval.Value.Ticks, bucketPrefix, "throttleInterval");
                 StringSetTo(bucket.ThrottleDelay.Value.Ticks, bucketPrefix, "throttleDelay");
             }
+        }
+
+        public Bucket LoadBucket(string appKey, string name = null) {
+            string bucketPrefix = MakeBucketKeyPrefix(appKey, name);
+            bool found = (bool)StringGet(bucketPrefix, "isActive");
+            if (!found) return null;
+            long? throttleIntervalTicks = (long?)StringGet(bucketPrefix, "throttleInterval");
+            long? throttleDelayTicks = (long?)StringGet(bucketPrefix, "throttleDelay");
+
+            return new Bucket(
+                appKey,
+                name,
+                (long)StringGet(bucketPrefix, "hitLimit"),
+                TimeSpan.FromTicks((long)StringGet(bucketPrefix, "limitInterval")),
+                (long?)StringGet(bucketPrefix, "throttleLimit"),
+                throttleIntervalTicks.HasValue ? TimeSpan.FromTicks(throttleIntervalTicks.Value) : default(TimeSpan?),
+                throttleDelayTicks.HasValue ? TimeSpan.FromTicks(throttleDelayTicks.Value) : default(TimeSpan?)
+            );
         }
 
 
