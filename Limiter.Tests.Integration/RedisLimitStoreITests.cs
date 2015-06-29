@@ -46,11 +46,11 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallThrice_Limits() {
             var sut = new RedisLimitStore(redis.GetDatabase());
-            string testLimitKey = Guid.NewGuid().ToString();
-            sut.Allows(appKey, bucket, testLimitKey);
-            sut.Allows(appKey, bucket, testLimitKey);
+            string testOpKey = Guid.NewGuid().ToString();
+            sut.Allows(appKey, bucket, testOpKey);
+            sut.Allows(appKey, bucket, testOpKey);
 
-            bool result = sut.Allows(appKey, bucket, testLimitKey);
+            bool result = sut.Allows(appKey, bucket, testOpKey);
 
             Assert.IsFalse(result);
         }
@@ -58,102 +58,100 @@ namespace Limtr.Lib.Tests.Integration {
         public void Allows_QuickBucketFor2PerSecondCallFiveTimesWithGapAfter2_AllowsFirstFour() {
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
-            string testLimitKey = Guid.NewGuid().ToString();
+            string testOpKey = Guid.NewGuid().ToString();
 
-            Assert.IsTrue(sut.Allows(appKey, quickBucket, testLimitKey), "First call");
-            Assert.IsTrue(sut.Allows(appKey, quickBucket, testLimitKey), "Second call");
+            Assert.IsTrue(sut.Allows(appKey, quickBucket, testOpKey), "First call");
+            Assert.IsTrue(sut.Allows(appKey, quickBucket, testOpKey), "Second call");
             System.Threading.Thread.Sleep(1000);
-            Assert.IsTrue(sut.Allows(appKey, quickBucket, testLimitKey), "Third call");
-            Assert.IsTrue(sut.Allows(appKey, quickBucket, testLimitKey), "Fourth call");
-            Assert.IsFalse(sut.Allows(appKey, quickBucket, testLimitKey));
+            Assert.IsTrue(sut.Allows(appKey, quickBucket, testOpKey), "Third call");
+            Assert.IsTrue(sut.Allows(appKey, quickBucket, testOpKey), "Fourth call");
+            Assert.IsFalse(sut.Allows(appKey, quickBucket, testOpKey));
         }
 
         [TestMethod]
-        public void SetupBucket_ForNewAppKeyAndBucket_BucketExists() {
+        public void Setup_ForNewAppKeyAndBucket_BucketExists() {
             string testAppKey = Guid.NewGuid().ToString();
-            string testBucket = "testBucket1";
+            string testBucketName = "testBucketName1";
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
 
             //act
-            sut.Setup(new Bucket(testAppKey, testBucket));
-            bool isActive = sut.IsActiveBucket(testAppKey, testBucket);
-
-            //assert
-            Assert.IsTrue(isActive);
+            sut.Setup(new Bucket(testAppKey, testBucketName));
+       
+            //assert (throws if not exist)
+            sut.LoadBucket(testAppKey, testBucketName);
         }
 
         [TestMethod]
-        public void SetupBucket_ForExistingAppKeyAndBucket_BucketExists() {
+        public void Setup_ForExistingAppKeyAndBucket_BucketExists() {
             string testAppKey = Guid.NewGuid().ToString();
-            string testBucket = "testBucket1";
+            string testBucketName = "testBucketName1";
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
-            sut.Setup(new Bucket(testAppKey, testBucket));
+            sut.Setup(new Bucket(testAppKey, testBucketName));
 
             //act
-            sut.Setup(new Bucket(testAppKey, testBucket));
-            bool isActive = sut.IsActiveBucket(testAppKey, testBucket);
+            sut.Setup(new Bucket(testAppKey, testBucketName));
 
-            //assert
-            Assert.IsTrue(isActive);
+            //assert (throws if not exist)
+            sut.LoadBucket(testAppKey, testBucketName);
         }
 
         [TestMethod]
-        public void SetupBucket_ForNewAppKey_DefaultBucketExists() {
+        public void Setup_ForNewAppKey_DefaultBucketExists() {
             string testAppKey = Guid.NewGuid().ToString();
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
 
             //act
             sut.Setup(new Bucket(testAppKey));
-            bool isActive = sut.IsActiveBucket(testAppKey);
 
-            //assert
-            Assert.IsTrue(isActive);
+            //assert (throws if not exist)
+            sut.LoadBucket(testAppKey);
         }
 
         [TestMethod]
-        public void IsActiveBucket_ForMadeUpAppKey_ReturnsFalse() {
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void LoadBucket_ForMadeUpAppKey_ThrowsException() {
             string testAppKey = Guid.NewGuid().ToString();
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
 
             //act
-            bool isActive = sut.IsActiveBucket(testAppKey);
+            sut.LoadBucket(testAppKey);
 
-            //assert
-            Assert.IsFalse(isActive);
+            //assert - throws 
         }
 
         [TestMethod]
-        public void IsActiveBucket_ForMadeUpAppKeyAndBucket_ReturnsFalse() {
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void LoadBucket_ForMadeUpAppKeyAndBucket_ReturnsFalse() {
             string testAppKey = Guid.NewGuid().ToString();
-            string testBucket = "testBucket1";
+            string testBucketName = "testBucketName1";
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
-
+                        
             //act
-            bool isActive = sut.IsActiveBucket(testAppKey, testBucket);
+            sut.LoadBucket(testAppKey, testBucketName);
 
-            //assert
-            Assert.IsFalse(isActive);
+            //assert (throws)
         }
 
 
         [TestMethod]
-        public void IsActiveBucket_ForNewAppKeyAndMadeUpBucket_ReturnsFalse() {
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void LoadBucket_ForNewAppKeyAndMadeUpBucket_ReturnsFalse() {
             string testAppKey = Guid.NewGuid().ToString();
-            string testBucket = "testBucket1";
+            string testBucketName = "testBucketName1";
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
             sut.Setup(new Bucket(testAppKey));
 
-            //act
-            bool isActive = sut.IsActiveBucket(testAppKey, testBucket);
 
-            //assert
-            Assert.IsFalse(isActive);
+            //act
+            sut.LoadBucket(testAppKey, testBucketName);
+
+            //assert (throws)
         }
 
 
@@ -163,16 +161,16 @@ namespace Limtr.Lib.Tests.Integration {
 
             IDatabase db = redis.GetDatabase();
             var sut = new RedisLimitStore(db);
-            string testLimitKey = Guid.NewGuid().ToString();
+            string testOpKey = Guid.NewGuid().ToString();
 
-            sut.Allows(appKey, quickBucket, testLimitKey);
-            sut.Allows(appKey, quickBucket, testLimitKey);
+            sut.Allows(appKey, quickBucket, testOpKey);
+            sut.Allows(appKey, quickBucket, testOpKey);
             System.Threading.Thread.Sleep(1000);
-            sut.Allows(appKey, quickBucket, testLimitKey);
-            sut.Allows(appKey, quickBucket, testLimitKey);
-            sut.Allows(appKey, quickBucket, testLimitKey);
+            sut.Allows(appKey, quickBucket, testOpKey);
+            sut.Allows(appKey, quickBucket, testOpKey);
+            sut.Allows(appKey, quickBucket, testOpKey);
 
-            RedisValue[] items = db.ListRange(RedisLimitStore.MakeHitKey(appKey, quickBucket, testLimitKey));
+            RedisValue[] items = db.ListRange(RedisLimitStore.MakeHitKey(appKey, quickBucket, testOpKey));
             Assert.AreEqual(2, items.Length);
         }
         [TestMethod]

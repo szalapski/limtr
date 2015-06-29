@@ -1,10 +1,9 @@
 ﻿using System;
 namespace Limtr.Lib {
     public interface ILimitStore {
-        bool Allows(string appKey, string bucket, string limitKey);
-        bool IsAllowed(string appKey, string bucket, string limitKey);
+        bool Allows(string appKey, string bucketName, string operationKey);
+        bool IsAllowed(string appKey, string bucketName, string operationKey);
         void Setup(Bucket bucket);
-        bool IsActiveAppKey(string appKey);
-        bool IsActiveBucket(string appKey, string bucket);
+        Bucket LoadBucket(string appKey, string name);
     }
 }

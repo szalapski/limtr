@@ -42,16 +42,11 @@ namespace Limtr.Lib {
             if (string.IsNullOrWhiteSpace(operationKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
             return string.Format("hits:{0}:{1}:{2}", appKey, bucket, operationKey);
         }
-        private static string MakeBucketKeyPrefix(string appKey, string bucket) {
-            return string.Format("buckets:{0}:{1}", appKey, bucket);
-        }
-        private static string MakeAppKeyPrefix(string appKey) {
-            return string.Format("appKeys:{0}", appKey);
-        }
 
         private void AddHit(string key) {
             _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
         }
+
         private void Throttle(Bucket bucket, string operationKey) {
             Stopwatch sw = Stopwatch.StartNew();
             if (!bucket.Throttles) return; 
@@ -70,23 +65,23 @@ namespace Limtr.Lib {
             return false;
         }
 
+        /*
         public bool IsActiveAppKey(string appKey) {
             if (appKey == null) throw new ArgumentNullException("appKey");
             RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
             return (bool)appKeyIsActive;
         }
 
-
-        public bool IsActiveBucket(string appKey, string bucket = null) {
+        public bool IsActiveBucket(string appKey, string bucketName = null) {
             if (appKey == null) throw new ArgumentNullException("appKey");
-            if (bucket == null) bucket = "default";
+            if (bucketName == null) bucketName = "default";
 
             RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
             if (!(bool)appKeyIsActive) return false;
-            RedisValue bucketIsActive = StringGet(MakeBucketKeyPrefix(appKey, bucket), "isActive");
+            RedisValue bucketIsActive = StringGet(MakeBucketKeyPrefix(appKey, bucketName), "isActive");
             return (bool)bucketIsActive;
         }
-
+        */
         public void Setup(Bucket bucket) {
             string bucketPrefix = MakeBucketKeyPrefix(bucket.AppKey, bucket.Name);
             StringSetTo(true, MakeAppKeyPrefix(bucket.AppKey), "isActive");
@@ -101,13 +96,13 @@ namespace Limtr.Lib {
         }
 
         public Bucket LoadBucket(string appKey, string name = null) {
-            // TODO: what about null bucket name == "default"?
+            if (name == null) name = "default";
             Bucket result = TryLoadBucket(appKey, name);
             if (result == null) throw new InvalidOperationException(string.Format("AppKey '{0}' or bucket '{1}' hasn't been setup.", appKey, name));
             return result;
         }
 
-        public Bucket TryLoadBucket(string appKey, string name = null) {
+        private Bucket TryLoadBucket(string appKey, string name = null) {
             string bucketPrefix = MakeBucketKeyPrefix(appKey, name);
             bool found = (bool)StringGet(bucketPrefix, "isActive");
             if (!found) return null;
@@ -125,7 +120,12 @@ namespace Limtr.Lib {
             );
         }
 
-
+        private static string MakeAppKeyPrefix(string appKey) {
+            return string.Format("appKeys:{0}", appKey);
+        }
+        private static string MakeBucketKeyPrefix(string appKey, string bucket) {
+            return string.Format("buckets:{0}:{1}", appKey, bucket);
+        }
         private static string Join(params string[] values) {
             return string.Join(":", values);
         }
