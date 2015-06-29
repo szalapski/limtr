@@ -8,7 +8,6 @@ namespace Limtr.Lib {
             _store = store;
         }
         private ILimitStore _store { get; set; }
-        private string _appKey {get; set;}
 
         /// <summary>
         /// If the operation represented by a key in the default bucket is allowed, records a hit.
@@ -63,6 +62,7 @@ namespace Limtr.Lib {
         private void VerifyBucketExists(string appKey, string bucketName){
             _store.LoadBucket(appKey, bucketName);
         }
+
 
 
     }

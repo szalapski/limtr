@@ -83,6 +83,8 @@ namespace Limtr.Lib {
         }
         */
         public void Setup(Bucket bucket) {
+            // TODO: optimize for redis speed
+
             string bucketPrefix = MakeBucketKeyPrefix(bucket.AppKey, bucket.Name);
             StringSetTo(true, MakeAppKeyPrefix(bucket.AppKey), "isActive");
             StringSetTo(true, bucketPrefix, "isActive");
@@ -103,6 +105,8 @@ namespace Limtr.Lib {
         }
 
         private Bucket TryLoadBucket(string appKey, string name = null) {
+            // TODO: optimize for redis speed
+
             string bucketPrefix = MakeBucketKeyPrefix(appKey, name);
             bool found = (bool)StringGet(bucketPrefix, "isActive");
             if (!found) return null;

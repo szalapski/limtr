@@ -15,6 +15,13 @@ namespace Limtr.Lib {
             get{
                 return new FatClient(new RedisLimitStore(muxer.GetDatabase()));
             }
+        }
+
+        public static AdminClient AzureAdminClient {
+            get {
+                return new AdminClient(new RedisLimitStore(muxer.GetDatabase()));
+            }
         }   
+
     }
 }
