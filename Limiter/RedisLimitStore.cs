@@ -11,40 +11,36 @@ namespace Limtr.Lib {
         }
         private IDatabase _database;
 
-        public bool Allows(string appKey, string bucket, string limitKey) {
-            bool allowed = IsAllowed(appKey, bucket, limitKey);
+        public bool Allows(string appKey, string bucketName, string operationKey) {
+            Bucket bucket = LoadBucket(appKey, bucketName);
+            bool allowed = IsAllowed(bucket, operationKey);
             if (allowed) {
-                Throttle(appKey, bucket, limitKey);
-                AddHit(MakeHitKey(appKey, bucket, limitKey));       // A disallowed call does not count against the limit
+                Throttle(bucket, operationKey);
+                AddHit(bucket.HitKeyFor(operationKey));       // A disallowed call does not count against the limit
             }
             return allowed;
         }
 
-        public bool IsAllowed(string appKey, string bucket, string limitKey) {
-            string key = MakeHitKey(appKey, bucket, limitKey);
-            string bucketPrefix = MakeBucketKeyPrefix(appKey, bucket);
-            // TODO: memoize
-            long limit = (long)_database.StringGet(string.Format("{0}:hitLimit", bucketPrefix));
-            var limitInterval = TimeSpan.FromTicks(
-                (long)_database.StringGet(string.Format("{0}:limitInterval", bucketPrefix)));
-            return IsAllowed(key, limit, limitInterval);
+        public bool IsAllowed(string appKey, string bucketName, string operationKey) {
+            return IsAllowed(LoadBucket(appKey, bucketName), operationKey);
         }
 
-        private bool IsAllowed(string key, long hitLimit, TimeSpan limitInterval) {
-            RedisValue itemInQuestion = _database.ListGetByIndex(key, hitLimit - 1);
+        private bool IsAllowed(Bucket bucket, string operationKey) {
+            string key = bucket.HitKeyFor(operationKey);
+            RedisValue itemInQuestion = _database.ListGetByIndex(key, bucket.HitLimit - 1);
             if (itemInQuestion.HasValue) {
-                Task.Run(() => _database.ListTrim(key, 0, hitLimit - 1));   // trim the list on a different thread - no need to wait  (todo: should be server op?)
+                Task.Run(() => _database.ListTrim(key, 0, bucket.HitLimit - 1));   // trim the list on a different thread - no need to wait  (todo: should be server op?)
                 TimeSpan elapsed = DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion);
-                if (elapsed <= limitInterval) return false;
+                if (elapsed <= bucket.LimitInterval) return false;
             }
             return true;
         }
 
-        public static string MakeHitKey(string appKey, string bucket, string limitKey) {
+        public static string MakeHitKey(string appKey, string bucket, string operationKey) {
             if (string.IsNullOrWhiteSpace(appKey)) appKey = "default";
             if (string.IsNullOrWhiteSpace(bucket)) bucket = "default";
-            if (string.IsNullOrWhiteSpace(limitKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
-            return string.Format("hits:{0}:{1}:{2}", appKey, bucket, limitKey);
+            if (string.IsNullOrWhiteSpace(operationKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
+            return string.Format("hits:{0}:{1}:{2}", appKey, bucket, operationKey);
         }
         private static string MakeBucketKeyPrefix(string appKey, string bucket) {
             return string.Format("buckets:{0}:{1}", appKey, bucket);
@@ -56,23 +52,20 @@ namespace Limtr.Lib {
         private void AddHit(string key) {
             _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
         }
-        private void Throttle(string appKey, string bucket, string limitKey) {
+        private void Throttle(Bucket bucket, string operationKey) {
             Stopwatch sw = Stopwatch.StartNew();
-            long? throttleLimit = (long?)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleLimit");
-            if (throttleLimit.HasValue) {
-                TimeSpan throttleInterval = TimeSpan.FromTicks((long)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleInterval"));
-                TimeSpan throttleDelay = TimeSpan.FromTicks((long)StringGet(MakeBucketKeyPrefix(appKey, bucket), "throttleDelay"));
-                bool needsDelay = NeedsThrottle(MakeHitKey(appKey, bucket, limitKey), throttleLimit.Value, throttleInterval);
-                sw.Stop();
-                TimeSpan delayNeeded = throttleDelay - sw.Elapsed + TimeSpan.FromMilliseconds(1);
-                if (needsDelay && delayNeeded > TimeSpan.Zero) System.Threading.Thread.Sleep(delayNeeded);
-            }
+            if (!bucket.Throttles) return; 
+            bool needsDelay = NeedsThrottle(bucket, operationKey);
+            sw.Stop();
+            TimeSpan delayNeeded = bucket.ThrottleDelay.Value - sw.Elapsed + TimeSpan.FromMilliseconds(1);
+            if (needsDelay && delayNeeded > TimeSpan.Zero) System.Threading.Thread.Sleep(delayNeeded);
         }
-        private bool NeedsThrottle(string key, long throttleLimit, TimeSpan throttleInterval) {
-            RedisValue itemInQuestion = _database.ListGetByIndex(key, throttleLimit - 1);
+        private bool NeedsThrottle(Bucket bucket, string operationKey) {
+            if (!bucket.Throttles) return false;
+            RedisValue itemInQuestion = _database.ListGetByIndex(bucket.HitKeyFor(operationKey), bucket.ThrottleLimit.Value - 1);
             if (itemInQuestion.HasValue) {
                 TimeSpan elapsed = DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion);
-                if (elapsed < throttleInterval) return true;
+                if (elapsed < bucket.ThrottleInterval) return true;
             }
             return false;
         }
@@ -108,6 +101,13 @@ namespace Limtr.Lib {
         }
 
         public Bucket LoadBucket(string appKey, string name = null) {
+            // TODO: what about null bucket name == "default"?
+            Bucket result = TryLoadBucket(appKey, name);
+            if (result == null) throw new InvalidOperationException(string.Format("AppKey '{0}' or bucket '{1}' hasn't been setup.", appKey, name));
+            return result;
+        }
+
+        public Bucket TryLoadBucket(string appKey, string name = null) {
             string bucketPrefix = MakeBucketKeyPrefix(appKey, name);
             bool found = (bool)StringGet(bucketPrefix, "isActive");
             if (!found) return null;

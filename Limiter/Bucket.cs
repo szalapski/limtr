@@ -55,6 +55,15 @@ namespace Limtr.Lib {
                 return ThrottleLimit.HasValue;
             }
         }
-    
+
+        public string KeyPrefix {
+            get {
+                return string.Format("buckets:{0}:{1}", AppKey, Name); 
+            }
+        }
+
+        public string HitKeyFor(string operationKey) {
+            return string.Format("hits:{0}:{1}:{2}", AppKey, Name, operationKey);
+        }
     }
 }
