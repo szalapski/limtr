@@ -40,7 +40,7 @@ namespace Limtr.Lib {
             if (string.IsNullOrWhiteSpace(appKey)) appKey = "default";
             if (string.IsNullOrWhiteSpace(bucket)) bucket = "default";
             if (string.IsNullOrWhiteSpace(operationKey)) throw new InvalidOperationException("bad key");    //TODO: get rid of primitive obsession
-            return string.Format("hits:{0}:{1}:{2}", appKey, bucket, operationKey);
+            return $"hits:{appKey}:{bucket}:{operationKey}";
         }
 
         private void AddHit(string key) {

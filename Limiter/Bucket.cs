@@ -58,12 +58,12 @@ namespace Limtr.Lib {
 
         public string KeyPrefix {
             get {
-                return string.Format("buckets:{0}:{1}", AppKey, Name); 
+                return $"buckets:{AppKey}:{Name}"; 
             }
         }
 
         public string HitKeyFor(string operationKey) {
-            return string.Format("hits:{0}:{1}:{2}", AppKey, Name, operationKey);
+            return $"hits:{AppKey}:{Name}:{operationKey}";
         }
     }
 }
