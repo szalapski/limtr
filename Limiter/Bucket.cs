@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Limtr.Lib {
+namespace Limtr.Lib
+{
     /// <summary>
     /// Represents the setup values for a bucket.
     /// </summary>
     public class Bucket {
-        //public Bucket(string appKey, string bucket = null, long hitLimit = 10, TimeSpan limitInterval = default(TimeSpan)) 
-        //: this(appKey, bucket, hitLimit, limitInterval, null, null, null)
-        //{
-        //}
 
         public Bucket(
             string appKey,
