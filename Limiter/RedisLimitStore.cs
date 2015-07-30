@@ -100,7 +100,7 @@ namespace Limtr.Lib {
         public Bucket LoadBucket(string appKey, string name = null) {
             if (name == null) name = "default";
             Bucket result = TryLoadBucket(appKey, name);
-            if (result == null) throw new InvalidOperationException(string.Format("AppKey '{0}' or bucket '{1}' hasn't been setup.", appKey, name));
+            if (result == null) throw new InvalidOperationException($"AppKey '{appKey}' or bucket '{name}' hasn't been setup.");
             return result;
         }
 
@@ -125,10 +125,10 @@ namespace Limtr.Lib {
         }
 
         private static string MakeAppKeyPrefix(string appKey) {
-            return string.Format("appKeys:{0}", appKey);
+            return $"appKeys:{appKey}";
         }
         private static string MakeBucketKeyPrefix(string appKey, string bucket) {
-            return string.Format("buckets:{0}:{1}", appKey, bucket);
+            return $"buckets:{appKey}:{bucket}";
         }
         private static string Join(params string[] values) {
             return string.Join(":", values);
