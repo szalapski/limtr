@@ -7,7 +7,7 @@ using Limtr.Lib;
 namespace Limtr.Lib.Tests.Integration {
     [TestClass]  
     public class RedisLimitStoreITests {
-        private static ConnectionMultiplexer redis;
+        private static Redis redis;
         private const string appKey = "RedisLimitStoreITests_Local";
         private const string bucket = "default";
         private const string quickBucket = "quick";
@@ -15,12 +15,10 @@ namespace Limtr.Lib.Tests.Integration {
         [ClassInitialize]
         public static void InitializeClass(TestContext context) {
             var redisOptions = new ConfigurationOptions() { EndPoints = { { "localhost", 6379 } }, AbortOnConnectFail = false, AllowAdmin = true };
-            redis = ConnectionMultiplexer.Connect(redisOptions);
+            redis = new Redis(ConnectionMultiplexer.Connect(redisOptions));
+            var sut = new RedisLimitStore(redis);
 
-            var db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
-
-            foreach (System.Net.EndPoint endpoint in redis.GetEndPoints()) redis.GetServer(endpoint).FlushAllDatabases();
+            foreach (IServer server in redis.Servers) server.FlushAllDatabases();
 
             sut.Setup(new Bucket(appKey, bucket, 2, TimeSpan.FromMinutes(1)));
             sut.Setup(new Bucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1)));
@@ -31,21 +29,21 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void TestRedisConnection() {
             int[] xxx = { 1, 2 };
-            var db = redis.GetDatabase();
+            var db = redis.Database;
             Console.WriteLine(db.Ping());
         }
 
         [TestMethod]
         public void Allows_For2PerMinuteCallOnce_DoesNotLimit() {
-            var db = redis.GetDatabase();
+            var db = redis.Database;
 
-            var sut = new RedisLimitStore(db);
+            var sut = new RedisLimitStore(redis);
             bool result = sut.Allows(appKey, bucket, Guid.NewGuid().ToString());
             Assert.IsTrue(result);
         }
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallThrice_Limits() {
-            var sut = new RedisLimitStore(redis.GetDatabase());
+            var sut = new RedisLimitStore(redis);
             string testOpKey = Guid.NewGuid().ToString();
             sut.Allows(appKey, bucket, testOpKey);
             sut.Allows(appKey, bucket, testOpKey);
@@ -56,8 +54,8 @@ namespace Limtr.Lib.Tests.Integration {
         }
         [TestMethod]
         public void Allows_QuickBucketFor2PerSecondCallFiveTimesWithGapAfter2_AllowsFirstFour() {
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             string testOpKey = Guid.NewGuid().ToString();
 
             Assert.IsTrue(sut.Allows(appKey, quickBucket, testOpKey), "First call");
@@ -72,8 +70,8 @@ namespace Limtr.Lib.Tests.Integration {
         public void Setup_ForNewAppKeyAndBucket_BucketExists() {
             string testAppKey = Guid.NewGuid().ToString();
             string testBucketName = "testBucketName1";
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
 
             //act
             sut.Setup(new Bucket(testAppKey, testBucketName));
@@ -86,8 +84,8 @@ namespace Limtr.Lib.Tests.Integration {
         public void Setup_ForExistingAppKeyAndBucket_BucketExists() {
             string testAppKey = Guid.NewGuid().ToString();
             string testBucketName = "testBucketName1";
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             sut.Setup(new Bucket(testAppKey, testBucketName));
 
             //act
@@ -100,8 +98,8 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void Setup_ForNewAppKey_DefaultBucketExists() {
             string testAppKey = Guid.NewGuid().ToString();
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
 
             //act
             sut.Setup(new Bucket(testAppKey));
@@ -114,8 +112,8 @@ namespace Limtr.Lib.Tests.Integration {
         [ExpectedException(typeof(InvalidOperationException))]
         public void LoadBucket_ForMadeUpAppKey_ThrowsException() {
             string testAppKey = Guid.NewGuid().ToString();
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
 
             //act
             sut.LoadBucket(testAppKey);
@@ -128,8 +126,8 @@ namespace Limtr.Lib.Tests.Integration {
         public void LoadBucket_ForMadeUpAppKeyAndBucket_ReturnsFalse() {
             string testAppKey = Guid.NewGuid().ToString();
             string testBucketName = "testBucketName1";
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
                         
             //act
             sut.LoadBucket(testAppKey, testBucketName);
@@ -143,8 +141,8 @@ namespace Limtr.Lib.Tests.Integration {
         public void LoadBucket_ForNewAppKeyAndMadeUpBucket_ReturnsFalse() {
             string testAppKey = Guid.NewGuid().ToString();
             string testBucketName = "testBucketName1";
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             sut.Setup(new Bucket(testAppKey));
 
 
@@ -159,8 +157,8 @@ namespace Limtr.Lib.Tests.Integration {
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGap_TrimsListTo2() {
             //This test sometimes fails--I believe because the async op to trim the list can take a few seconds.
 
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             string testOpKey = Guid.NewGuid().ToString();
 
             sut.Allows(appKey, quickBucket, testOpKey);
@@ -175,8 +173,8 @@ namespace Limtr.Lib.Tests.Integration {
         }
         [TestMethod]
         public void Allows_ForSetupThrottledBucketWithLimitAndThrottle_Throttles() {
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             string appKey = Guid.NewGuid().ToString(), bucket = "test", operation = "op1";
             sut.Setup(new Bucket(appKey, bucket, 3, TimeSpan.FromSeconds(60), 2, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(1)));
             sut.Allows(appKey, bucket, operation);
@@ -194,8 +192,8 @@ namespace Limtr.Lib.Tests.Integration {
         }
         [TestMethod]
         public void Allows_ForSetupThrottledBucketWithLimitAndThrottle_Limits() {
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             string appKey = Guid.NewGuid().ToString(), bucket = "test", operation = "op1";
             sut.Setup(new Bucket(appKey, bucket, 3, TimeSpan.FromSeconds(60), 2, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(1)));
             sut.Allows(appKey, bucket, operation);
@@ -210,8 +208,8 @@ namespace Limtr.Lib.Tests.Integration {
         }
         [TestMethod]
         public void Allows_ForSetupThrottledBucketWithLimitAndWithoutThrottle_LimitsWithoutThrottle() {
-            IDatabase db = redis.GetDatabase();
-            var sut = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var sut = new RedisLimitStore(redis);
             string appKey = Guid.NewGuid().ToString(), bucket = "test", operation = "op1";
             sut.Setup(new Bucket(appKey, bucket, 2, TimeSpan.FromSeconds(60)));
             sut.Allows(appKey, bucket, operation);
@@ -232,11 +230,11 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void PerformanceTest() {
             for (int i = 0; i < 10; i++) {
-                var db = redis.GetDatabase();
+                var db = redis.Database;
 
                 Console.WriteLine(db.Ping().TotalMilliseconds);
 
-                var sut = new RedisLimitStore(db);
+                var sut = new RedisLimitStore(redis);
                 var sw = Stopwatch.StartNew();
                 bool result = sut.Allows(appKey, bucket, Guid.NewGuid().ToString());
                 sw.Stop();

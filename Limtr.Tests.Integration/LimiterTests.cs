@@ -35,5 +35,13 @@ namespace Limtr.Tests.Integration {
             }
         }
 
+
+        [TestMethod]
+        public void IsAllowed_20ExecutionsOnFreeApp_AllowsAll() {
+            var limiter = new Limiter("free");
+            for (int i = 0; i < 20; i++) {
+                Assert.IsTrue(limiter.IsAllowed(GetCurrentMethod().Name), $"Iteration index {i} was improperly disallowed");
+            }
+        }
     }
 }

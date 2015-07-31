@@ -46,7 +46,9 @@
     <Compile Include="AdminClient.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Bucket.cs" />
+    <Compile Include="IRedis.cs" />
     <Compile Include="LimitReachedException.cs" />
+    <Compile Include="Redis.cs" />
     <Compile Include="RedisLimitStore.cs" />
     <Compile Include="ILimitStore.cs" />
     <Compile Include="FatClient.cs" />

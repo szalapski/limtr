@@ -1,15 +1,16 @@
 ﻿using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Limtr.Lib {
     public class RedisLimitStore : ILimitStore {
 
-        public RedisLimitStore(IDatabase redisDatabase) {
-            _database = redisDatabase;
+        public RedisLimitStore(IRedis redis) {
+            _redis = redis;
         }
-        private IDatabase _database;
+        private IRedis _redis;
 
         public bool Allows(string appKey, string bucketName, string operationKey) {
             Bucket bucket = LoadBucket(appKey, bucketName);
@@ -27,9 +28,9 @@ namespace Limtr.Lib {
 
         private bool IsAllowed(Bucket bucket, string operationKey) {
             string key = bucket.HitKeyFor(operationKey);
-            RedisValue itemInQuestion = _database.ListGetByIndex(key, bucket.HitLimit - 1);
+            RedisValue itemInQuestion = _redis.Database.ListGetByIndex(key, bucket.HitLimit - 1);
             if (itemInQuestion.HasValue) {
-                Task.Run(() => _database.ListTrim(key, 0, bucket.HitLimit - 1));   // trim the list on a different thread - no need to wait  (todo: should be server op?)
+                Task.Run(() => _redis.Database.ListTrim(key, 0, bucket.HitLimit - 1));   // trim the list on a different thread - no need to wait  (todo: should be server op?)
                 TimeSpan elapsed = DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion);
                 if (elapsed <= bucket.LimitInterval) return false;
             }
@@ -44,12 +45,12 @@ namespace Limtr.Lib {
         }
 
         private void AddHit(string key) {
-            _database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
+            _redis.Database.ListLeftPush(key, DateTime.Now.ToFileTimeUtc());
         }
 
         private void Throttle(Bucket bucket, string operationKey) {
             Stopwatch sw = Stopwatch.StartNew();
-            if (!bucket.Throttles) return; 
+            if (!bucket.Throttles) return;
             bool needsDelay = NeedsThrottle(bucket, operationKey);
             sw.Stop();
             TimeSpan delayNeeded = bucket.ThrottleDelay.Value - sw.Elapsed + TimeSpan.FromMilliseconds(1);
@@ -57,7 +58,7 @@ namespace Limtr.Lib {
         }
         private bool NeedsThrottle(Bucket bucket, string operationKey) {
             if (!bucket.Throttles) return false;
-            RedisValue itemInQuestion = _database.ListGetByIndex(bucket.HitKeyFor(operationKey), bucket.ThrottleLimit.Value - 1);
+            RedisValue itemInQuestion = _redis.Database.ListGetByIndex(bucket.HitKeyFor(operationKey), bucket.ThrottleLimit.Value - 1);
             if (itemInQuestion.HasValue) {
                 TimeSpan elapsed = DateTime.UtcNow - DateTime.FromFileTimeUtc((long)itemInQuestion);
                 if (elapsed < bucket.ThrottleInterval) return true;
@@ -65,23 +66,6 @@ namespace Limtr.Lib {
             return false;
         }
 
-        /*
-        public bool IsActiveAppKey(string appKey) {
-            if (appKey == null) throw new ArgumentNullException("appKey");
-            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
-            return (bool)appKeyIsActive;
-        }
-
-        public bool IsActiveBucket(string appKey, string bucketName = null) {
-            if (appKey == null) throw new ArgumentNullException("appKey");
-            if (bucketName == null) bucketName = "default";
-
-            RedisValue appKeyIsActive = StringGet(MakeAppKeyPrefix(appKey), "isActive");
-            if (!(bool)appKeyIsActive) return false;
-            RedisValue bucketIsActive = StringGet(MakeBucketKeyPrefix(appKey, bucketName), "isActive");
-            return (bool)bucketIsActive;
-        }
-        */
         public void Setup(Bucket bucket) {
             // TODO: optimize for redis speed
 
@@ -124,6 +108,11 @@ namespace Limtr.Lib {
             );
         }
 
+        public IEnumerable<Bucket> LoadBuckets(string appKey) {
+            throw new NotImplementedException();
+        }
+
+
         private static string MakeAppKeyPrefix(string appKey) {
             return $"appKeys:{appKey}";
         }
@@ -134,10 +123,16 @@ namespace Limtr.Lib {
             return string.Join(":", values);
         }
         private bool StringSetTo(RedisValue value, params string[] redisKeyParts) {
-            return _database.StringSet(Join(redisKeyParts), value);
+            return _redis.Database.StringSet(Join(redisKeyParts), value);
         }
         private RedisValue StringGet(params string[] redisKeyParts) {
-            return _database.StringGet(Join(redisKeyParts));
+            return _redis.Database.StringGet(Join(redisKeyParts));
         }
+        private RedisValue MultipleGet(params string[] startOfKeyParts) {
+            throw new NotImplementedException();
+        }
+
+
+
     }
 }
