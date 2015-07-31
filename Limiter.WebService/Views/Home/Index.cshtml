@@ -11,7 +11,7 @@
 $('#myButton').click(function () {
     $.ajax({
         type: 'POST',
-        url: 'http://SUPER-SECRET-URL-NOT-RELEASED-YET/api/limit?appKey=free&limitKey=myOperation1',
+        url: 'http://SUPER-SECRET-URL-NOT-RELEASED-YET/api/limit?appKey=free&operationKey=myOperation1',
         success: function(isAllowed) {
             if (isAllowed) { /* invoke the full functionality here */ }
             else alert("Sorry, you have made too many attempts. Please try again later.");

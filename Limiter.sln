@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib", "Limiter\Lib.csproj", "{ED790E4D-23CD-49D3-8852-1D29A9202399}"
 EndProject
@@ -27,6 +27,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limtr", "Limtr\Limtr.csproj", "{A5AF3393-0BCD-44AF-AA35-B6003B22D7BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefSite", "RefSite\RefSite.csproj", "{76E7B863-22A7-4A11-8D2E-95488256ECAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limtr.Tests.Integration", "Limtr.Tests.Integration\Limtr.Tests.Integration.csproj", "{DB620FDC-9F4D-4150-93F1-503756F7F68D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,10 @@ Global
 		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76E7B863-22A7-4A11-8D2E-95488256ECAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB620FDC-9F4D-4150-93F1-503756F7F68D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB620FDC-9F4D-4150-93F1-503756F7F68D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB620FDC-9F4D-4150-93F1-503756F7F68D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB620FDC-9F4D-4150-93F1-503756F7F68D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,5 +72,6 @@ Global
 		{80197599-54FE-4951-8972-88B62F6E45F6} = {1622E09F-143C-4E98-BBD5-AFCDD70B279C}
 		{EAEC79BD-81CC-4053-83A7-10FA2126A874} = {1622E09F-143C-4E98-BBD5-AFCDD70B279C}
 		{B2784E07-7A1B-4F90-A6AD-CD2AEE186B7B} = {EEF29052-3088-4C14-8DDE-E66F70E5D648}
+		{DB620FDC-9F4D-4150-93F1-503756F7F68D} = {1622E09F-143C-4E98-BBD5-AFCDD70B279C}
 	EndGlobalSection
 EndGlobal
