@@ -225,8 +225,6 @@ namespace Limtr.Lib.Tests.Integration {
             Assert.IsFalse(result);
         }
 
-
-
         [TestMethod]
         public void PerformanceTest() {
             for (int i = 0; i < 10; i++) {
@@ -241,6 +239,8 @@ namespace Limtr.Lib.Tests.Integration {
                 Console.WriteLine("Allows: {0}", sw.Elapsed.TotalMilliseconds);
             }
         }
+
+
 
     }
 

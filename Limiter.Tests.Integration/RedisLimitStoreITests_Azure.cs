@@ -6,7 +6,7 @@ using Limtr.Lib;
 
 namespace Limtr.Lib.Tests.Integration {
  
-   // [TestClass]   // generally disabled to avoid too much traffic to Azure
+    [TestClass]   // generally disabled to avoid too much traffic to Azure
     public class RedisLimitStoreITests_Azure {
         private static Redis redis;
 
@@ -125,6 +125,18 @@ namespace Limtr.Lib.Tests.Integration {
             }
         }
         #endregion
+
+
+        [TestMethod]
+        public void test1() {
+            var sut = new RedisLimitStore(redis);
+            var result = sut.LoadBuckets("free");
+            foreach (Bucket b in result) {
+                Console.WriteLine(b.Name);
+            }
+        }
+
+        ///////////////// HERE: Why do I get "no connection available" error?
     }
 
 

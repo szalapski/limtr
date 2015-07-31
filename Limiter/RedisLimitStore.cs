@@ -109,7 +109,14 @@ namespace Limtr.Lib {
         }
 
         public IEnumerable<Bucket> LoadBuckets(string appKey) {
-            throw new NotImplementedException();
+            string keyStart = $"buckets:{appKey}:";
+            var keys = GetBucketKeysThatStartWith(keyStart);
+            foreach (RedisKey key in keys) {
+                string sKey = (string)key;
+                string bucketName = ((string)key).Substring(keyStart.Length, sKey.Length - keyStart.Length - ":isActive".Length);
+                Bucket bucket = TryLoadBucket(appKey, bucketName);
+                if (bucket != null) yield return bucket;
+            }
         }
 
 
@@ -128,11 +135,10 @@ namespace Limtr.Lib {
         private RedisValue StringGet(params string[] redisKeyParts) {
             return _redis.Database.StringGet(Join(redisKeyParts));
         }
-        private RedisValue MultipleGet(params string[] startOfKeyParts) {
-            throw new NotImplementedException();
+        private IEnumerable<RedisKey> GetBucketKeysThatStartWith(params string[] startOfKeyParts) {
+            foreach (IServer server in _redis.Servers)
+                foreach (RedisKey key in server.Keys(pattern: Join(startOfKeyParts) + "*:isActive"))
+                    yield return key;
         }
-
-
-
     }
 }
