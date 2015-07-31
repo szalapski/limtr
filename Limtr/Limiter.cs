@@ -2,14 +2,12 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Limtr
-{
-    public class Limiter
-    {
+namespace Limtr {
+    public class Limiter {
         public Limiter(string appKey) {
             _appKey = appKey;
         }
-        private string _appKey {get; set;}
+        private string _appKey { get; set; }
 
         public Uri apiUri { get; set; } = new Uri("http://limtr.azurewebsites.net/api/");
 
@@ -18,23 +16,18 @@ namespace Limtr
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
         public bool Allows(string operationKey) {
-            using (var client= new HttpClient())
-            {
+            using (var client = new HttpClient()) {
                 client.BaseAddress = apiUri;
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                HttpResponseMessage response = client.GetAsync($"Limit?appKey={_appKey}&bucketName=default&operationKey={operationKey}").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                  
+                HttpResponseMessage response = client.PostAsync($"Limit?appKey={_appKey}&bucketName=default&operationKey={operationKey}", new ByteArrayContent(new byte[0])).Result;
+                if (response.IsSuccessStatusCode) {
+                    return response.Content.ReadAsStringAsync().Result == "true";
                 }
-                else
-                {
-                    //Something has gone wrong, handle it here
+                else {
+                    throw new InvalidOperationException(); // TODO: better error handling
                 }
-
             }
-            return false;
         }
 
         /// <summary>
