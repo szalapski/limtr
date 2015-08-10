@@ -6,17 +6,16 @@ using Limtr.Lib;
 
 namespace Limtr.Lib.Tests.Integration {
  
-    //[TestClass]   // generally disabled to avoid too much traffic to Azure
+    [TestClass]   // generally disabled to avoid too much traffic to Azure
     public class RedisLimitStoreITests_Azure {
-        private static ConnectionMultiplexer redis;
+        private static Redis redis;
 
         [ClassInitialize]
         public static void InitializeClass(TestContext context) {
             var redisOptions = new ConfigurationOptions() { EndPoints = { { "limtr.redis.cache.windows.net", 6379 } }, Password = "sAR88chKOP4xtk9dVI6uCbZTqsg5pyq/jc7eKg3pHqI=" };
-            redis = ConnectionMultiplexer.Connect(redisOptions);
-
-            var db = redis.GetDatabase();
-            var store = new RedisLimitStore(db);
+            redis = new Redis(ConnectionMultiplexer.Connect(redisOptions));
+           
+            var store = new RedisLimitStore(redis);
             store.Setup(new Bucket(appKey, bucket, 2, TimeSpan.FromMinutes(1)));
             store.Setup(new Bucket(appKey, quickBucket, 2, TimeSpan.FromSeconds(1)));
             //store.Setup(new Bucket("free", null, 10, TimeSpan.FromSeconds(10), 7, TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(200)));
@@ -30,7 +29,7 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void TestRedisConnection() {
             int[] xxx = { 1, 2 };
-            var db = redis.GetDatabase();
+            var db = redis.Database;
             Console.WriteLine(db.Ping());
         }
 
@@ -39,27 +38,23 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void TestRedisFreeApp() {
             int[] xxx = { 1, 2 };
-            var db = redis.GetDatabase();
-            var store = new RedisLimitStore(db);
+            var store = new RedisLimitStore(redis);
             // TODO
             //Assert.IsTrue(store.IsActiveAppKey("free"), "AppKey not found");
            // Assert.IsTrue(store.IsActiveBucket("free","default"), "bucket not found");
-            
-
         }
 
         
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallOnce_DoesNotLimit() {
-            var db = redis.GetDatabase();
 
-            var store = new RedisLimitStore(db);
+            var store = new RedisLimitStore(redis);
             bool result = store.Allows(appKey, bucket, Guid.NewGuid().ToString());
             Assert.IsTrue(result);
         }
         [TestMethod]
         public void Allows_DefaultBucketFor2PerMinuteCallThrice_Limits() {
-            var store = new RedisLimitStore(redis.GetDatabase());
+            var store = new RedisLimitStore(redis);
             string testOpKey = Guid.NewGuid().ToString();
             store.Allows(appKey, bucket, testOpKey);
             store.Allows(appKey, bucket, testOpKey);
@@ -70,8 +65,7 @@ namespace Limtr.Lib.Tests.Integration {
         }
         [TestMethod]
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGapAfter2_AllowsFirstFour() {
-            IDatabase db = redis.GetDatabase();
-            var store = new RedisLimitStore(db);
+            var store = new RedisLimitStore(redis);
             string testOpKey = Guid.NewGuid().ToString();
 
             Assert.IsTrue(store.Allows(appKey, quickBucket, testOpKey), "First call");
@@ -84,8 +78,8 @@ namespace Limtr.Lib.Tests.Integration {
 
         [TestMethod]
         public void Allows_DefaultBucketFor2PerSecondCallFiveTimesWithGap_TrimsListTo2() {
-            IDatabase db = redis.GetDatabase();
-            var store = new RedisLimitStore(db);
+            IDatabase db = redis.Database;
+            var store = new RedisLimitStore(redis);
             string testOpKey = Guid.NewGuid().ToString();
 
             store.Allows(appKey, quickBucket, testOpKey);
@@ -104,11 +98,10 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void AllowsPerformanceTest() {
             for (int i = 0; i < 10; i++) {
-                var db = redis.GetDatabase();
 
-                Console.WriteLine("Ping {0}", db.Ping().TotalMilliseconds);
+                Console.WriteLine("Ping {0}", redis.Database.Ping().TotalMilliseconds);
 
-                var store = new RedisLimitStore(db);
+                var store = new RedisLimitStore(redis);
                 var sw = Stopwatch.StartNew();
                 bool result = store.Allows(appKey, bucket, Guid.NewGuid().ToString());
                 sw.Stop();
@@ -119,10 +112,9 @@ namespace Limtr.Lib.Tests.Integration {
         [TestMethod]
         public void IsAllowedPerformanceTest() {
             for (int i = 0; i < 10; i++) {
-                var db = redis.GetDatabase();
 
-                Console.WriteLine("Ping {0}", db.Ping().TotalMilliseconds);
-                var store = new RedisLimitStore(db);
+                Console.WriteLine("Ping {0}", redis.Database.Ping().TotalMilliseconds);
+                var store = new RedisLimitStore(redis);
                 string limitKey = Guid.NewGuid().ToString();
                 store.Allows(appKey, bucket, limitKey);
 
@@ -133,6 +125,18 @@ namespace Limtr.Lib.Tests.Integration {
             }
         }
         #endregion
+
+
+        [TestMethod]
+        public void test1() {
+            var sut = new RedisLimitStore(redis);
+            var result = sut.LoadBuckets("free");
+            foreach (Bucket b in result) {
+                Console.WriteLine(b.Name);
+            }
+        }
+
+        ///////////////// HERE: Why do I get "no connection available" error?
     }
 
 
