@@ -6,7 +6,7 @@ using Limtr.Lib;
 
 namespace Limtr.Lib.Tests.Integration {
  
-    [TestClass]   // generally disabled to avoid too much traffic to Azure
+    //[TestClass]   // generally disabled to avoid too much traffic to Azure
     public class RedisLimitStoreITests_Azure {
         private static Redis redis;
 

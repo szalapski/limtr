@@ -163,7 +163,7 @@ namespace Limtr.Lib.Tests.Integration {
 
             sut.Allows(appKey, quickBucket, testOpKey);
             sut.Allows(appKey, quickBucket, testOpKey);
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(3000);
             sut.Allows(appKey, quickBucket, testOpKey);
             sut.Allows(appKey, quickBucket, testOpKey);
             sut.Allows(appKey, quickBucket, testOpKey);
