@@ -6,12 +6,15 @@ namespace Limtr.Lib {
     public class Redis : IRedis {
         public Redis(ConnectionMultiplexer muxer) {
             _muxer = muxer;
-            Database = muxer.GetDatabase();
             Endpoints = muxer.GetEndPoints();
         }  
         private ConnectionMultiplexer _muxer;
 
-        public IDatabase Database { get; private set; }
+        public IDatabase Database {
+            get {
+                return _muxer.GetDatabase();
+            }
+        }
         public EndPoint[] Endpoints { get; private set; }
         public IEnumerable<IServer> Servers {
             get {
@@ -19,6 +22,8 @@ namespace Limtr.Lib {
                     yield return _muxer.GetServer(endpoint);
             }
         }
+
+
 
     }
 }
