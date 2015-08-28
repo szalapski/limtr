@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 
 namespace Limtr {
     public class Limiter {
-        public Limiter(string appKey) {
+        public Limiter(string appKey = "free") {
             _appKey = appKey;
         }
         private string _appKey { get; set; }
@@ -12,19 +12,34 @@ namespace Limtr {
         public Uri apiUri { get; set; } = new Uri("http://limtr.azurewebsites.net/api/");
 
         /// <summary>
-        /// If the operation represented by the limit key is allowed, records a hit.
+        /// If the operation represented by the operation key is allowed, records a hit.
         /// </summary>
-        /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
+        /// <returns>True if the operation should be allowed, and false if the operation should be rejected.</returns>
         public bool Allows(string operationKey) {
-            return AllowedPrivate(operationKey, doPost: true);
+            return Allowed(operationKey, doPost: true);
+        }
+        /// <summary>
+        /// If the operation represented by the operation key is allowed, records a hit.
+        /// </summary>
+        /// <returns>False if the operation should be allowed, and true if the operation should be rejected.</returns>
+        /// <remarks>Syntactic sugar for !Allows(string).</remarks>
+        public bool Forbids(string operationKey) {
+            return !Allows(operationKey);
         }
 
         /// <summary>
         /// Peeks at whether the operation represented by the limit key is allowed. Does not record a hit.
         /// </summary>
-        /// <returns>True if the operation should be allowed, and false if the operation should be rejected or throttled.</returns>
+        /// <returns>True if the operation should be allowed, and false if the operation should be rejected.</returns>
         public bool IsAllowed(string operationKey) {
-            return AllowedPrivate(operationKey, doPost: false);
+            return Allowed(operationKey, doPost: false);
+        }
+        /// <summary>
+        /// Peeks at whether the operation represented by the limit key is allowed. Does not record a hit.
+        /// </summary>
+        /// <returns>False if the operation should be allowed, and true if the operation should be rejected.</returns>
+        public bool IsForbidden(string operationKey) {
+            return !IsAllowed(operationKey);
         }
 
         /// <summary>
@@ -32,10 +47,10 @@ namespace Limtr {
         /// </summary>
         /// <exception cref="LimitReachedException">Thrown if the operation should be rejected or throttled</exception>
         public void Hit(string operationKey) {
-            if (!AllowedPrivate(operationKey, doPost: true)) throw new InvalidOperationException(); // TODO: better exception type
+            if (!Allowed(operationKey, doPost: true)) throw new InvalidOperationException(); // TODO: better exception type
         }
 
-        private bool AllowedPrivate(string operationKey, bool doPost = false) {
+        private bool Allowed(string operationKey, bool doPost = false) {
             using (var client = new HttpClient()) {
                 client.BaseAddress = apiUri;
                 client.DefaultRequestHeaders.Accept.Clear();

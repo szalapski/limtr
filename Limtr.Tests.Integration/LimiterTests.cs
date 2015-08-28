@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static System.Reflection.MethodBase;
+using Limtr;  // others will need this
 
 namespace Limtr.Tests.Integration {
     [TestClass]
@@ -43,5 +44,21 @@ namespace Limtr.Tests.Integration {
                 Assert.IsTrue(limiter.IsAllowed(GetCurrentMethod().Name), $"Iteration index {i} was improperly disallowed");
             }
         }
+
+        [TestMethod]
+        public void IsAllowed_20ExecutionsOnFreeApp_ThrottlesNoneMoreThan200ms() {
+            // TODO: improve performance
+            var limiter = new Limiter("free");
+            limiter.Allows(GetCurrentMethod().Name);
+            for (int i = 0; i < 20; i++) {
+                Stopwatch sw = Stopwatch.StartNew();
+                Assert.IsTrue(limiter.Allows(GetCurrentMethod().Name), "Limiter improperly refused the operation");
+                sw.Stop();
+                Console.WriteLine(sw.ElapsedMilliseconds);
+                Assert.IsTrue(sw.ElapsedMilliseconds < 200);
+            }
+        }
+
+
     }
 }
