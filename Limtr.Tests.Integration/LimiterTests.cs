@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static System.Reflection.MethodBase;
-using Limtr;  // others will need this
 
 namespace Limtr.Tests.Integration {
     [TestClass]
@@ -47,7 +46,7 @@ namespace Limtr.Tests.Integration {
 
         [TestMethod]
         public void IsAllowed_20ExecutionsOnFreeApp_ThrottlesNoneMoreThan200ms() {
-            // TODO: improve performance
+            // TODO: improve performance so this test can pass
             var limiter = new Limiter("free");
             limiter.Allows(GetCurrentMethod().Name);
             for (int i = 0; i < 20; i++) {
