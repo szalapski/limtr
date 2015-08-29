@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Limtr</id>
+    <version>0.1.0</version>
+    <title>Limtr - ultra-simple rate limiting and throttling</title>
+    <authors>Patrick Szalapski</authors>
+    <owners></owners>
+    <description>
+      The official client for using the Limtr.com rate limiting and throttling web service.
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <language>en-US</language>
+    <projectUrl>https://Limtr.com</projectUrl>
+    <iconUrl>https://nuget.org/Content/Images/packageDefaultIcon-50x50.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://Limtr.com</licenseUrl>
+    <dependencies>
+        <group targetFramework="net452">
+          <dependency id="System.Net.Http" version="4.0.0" />
+        </group>
+    </dependencies>
+    <tags>rate rate-limit rate-limiting throttle throttling</tags>
+  </metadata>
+</package>
