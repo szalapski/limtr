@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Limiter.cs" />
+    <Compile Include="OverLimitException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -56,9 +57,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>move Limtr.* lib\net452
-..\Nuget.exe pack Package.nuspec -Verbosity Detailed
-xcopy *.nupkg ..\..\Limiter.WebService\Content /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy Limtr.* package\lib\net452 /Y /I
+move /Y Package.nuspec package
+cd package
+..\..\Nuget.exe pack Package.nuspec -Verbosity Detailed
+xcopy *.nupkg ..\..\..\Limiter.WebService\Content /Y /I</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

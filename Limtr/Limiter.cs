@@ -51,9 +51,10 @@ namespace Limtr {
         /// If the operation represented by the limit key should allowed, records a hit and throttles if necessary; 
         /// throws exception if the operation should be rejected.
         /// </summary>
-        /// <exception cref="LimitReachedException">Thrown if the operation should be rejected or throttled</exception>
+        /// <exception cref="OverLimitException">Thrown if the operation should be rejected or throttled.</exception> 
+        /// <remarks>Use only when you expect to be under the limit. Otherwise, use Allowed(string).</remarks>
         public void Hit(string operationKey) {
-            if (!Allowed(operationKey, doPost: true)) throw new InvalidOperationException(); // TODO: better exception type
+            if (!Allowed(operationKey, doPost: true)) throw new OverLimitException();
         }
 
         private bool Allowed(string operationKey, bool doPost = false) {
