@@ -61,7 +61,8 @@
 move /Y Package.nuspec package
 cd package
 ..\..\Nuget.exe pack Package.nuspec -Verbosity Detailed
-xcopy *.nupkg ..\..\..\Limiter.WebService\Content /Y /I</PostBuildEvent>
+xcopy *.nupkg ..\..\..\Limiter.WebService\Content /Y /I
+rd /S /Q lib</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
