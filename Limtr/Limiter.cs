@@ -3,6 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace Limtr {
+    /// <summary>
+    /// Provides functions for rate limiting and throttling, using the Limtr web service.
+    /// </summary>
     public class Limiter {
         public Limiter(string appKey = "free") {
             _appKey = appKey;
@@ -12,14 +15,16 @@ namespace Limtr {
         public Uri apiUri { get; set; } = new Uri("http://limtr.azurewebsites.net/api/");
 
         /// <summary>
-        /// If the operation represented by the operation key is allowed, records a hit.
+        /// Returns whether the operation represented by the limit key should be allowed. 
+        /// If so, also records a hit and throttles if necessary.
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected.</returns>
         public bool Allows(string operationKey) {
             return Allowed(operationKey, doPost: true);
         }
         /// <summary>
-        /// If the operation represented by the operation key is allowed, records a hit.
+        /// Returns whether the operation represented by the limit key should be forbidden. 
+        /// If not, also records a hit and throttles if necessary.
         /// </summary>
         /// <returns>False if the operation should be allowed, and true if the operation should be rejected.</returns>
         /// <remarks>Syntactic sugar for !Allows(string).</remarks>
@@ -28,14 +33,14 @@ namespace Limtr {
         }
 
         /// <summary>
-        /// Peeks at whether the operation represented by the limit key is allowed. Does not record a hit.
+        /// Peeks at whether the operation represented by the limit key should be allowed. Does not record a hit or throttle.
         /// </summary>
         /// <returns>True if the operation should be allowed, and false if the operation should be rejected.</returns>
         public bool IsAllowed(string operationKey) {
             return Allowed(operationKey, doPost: false);
         }
         /// <summary>
-        /// Peeks at whether the operation represented by the limit key is allowed. Does not record a hit.
+        /// Peeks at whether the operation represented by the limit key should be forbidden. Does not record a hit or throttle.
         /// </summary>
         /// <returns>False if the operation should be allowed, and true if the operation should be rejected.</returns>
         public bool IsForbidden(string operationKey) {
@@ -43,7 +48,8 @@ namespace Limtr {
         }
 
         /// <summary>
-        /// If the operation represented by the limit key is allowed, records a hit; throws exception if the operation should be rejected or throttled.
+        /// If the operation represented by the limit key should allowed, records a hit and throttles if necessary; 
+        /// throws exception if the operation should be rejected.
         /// </summary>
         /// <exception cref="LimitReachedException">Thrown if the operation should be rejected or throttled</exception>
         public void Hit(string operationKey) {
